@@ -1,10 +1,8 @@
-import sessions from "../tests/sessions";
-import users from "../tests/users";
+import sessions from "../tests/sessions.js";
+import users from "../tests/users.js";
 
 export function authenticateUser(req, res, next){
-    console.log(req.cookies)
     const sessionId = req.cookies.sessionId;
-    console.log("here")
     const session = sessions.find( s => (s.id === sessionId));
 
     if (!sessionId) {

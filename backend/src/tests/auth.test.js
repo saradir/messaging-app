@@ -4,7 +4,9 @@ import authRouter from "../routers/auth.router.js";
 import request from "supertest";
 import express from "express";
 import cookieParser from "cookie-parser";
-
+import session from "express-session";
+import passport from "passport";
+import "../config/passport.js";
 
 const app = express();
 
@@ -12,13 +14,31 @@ const app = express();
 const agent = request.agent(app);
 app.use(cookieParser());
 app.use(express.json());
+app.use(session({
+  secret: "test-secret",
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use("/api/auth", authRouter);
 
-const email = "test@test.com"
-const username = "test_user"
+// error handler
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    message: err.message,
+    name: err.name,
+    code: err.code,     
+  });
+});
+const randomPrefix = crypto.randomUUID();
+const email = `${randomPrefix}-test@test.com`
+const username = `${randomPrefix}-test_user`
 const password = "1234"
 
 test("auth flow works", async () => {
+
   await agent
     .post("/api/auth/register")
     .send({ email, username, password })
@@ -38,29 +58,3 @@ test("auth flow works", async () => {
 });
 
 
-/*
-test("registration works", () => {
-   return agent
-    .post("/api/auth/register")
-    .type("json")
-    .send({ email: "test@test.com", username: "test_user", password: "1234"})
-    .expect(201)
-    .expect({success: true})
-    
-});
-
-test("login works", () => {
-    return agent
-    .post("/api/auth/login")
-    .type("json")
-    .send({email: "test@test.com", password: "1234" })
-    .expect(200)
-});
-
-test("identification works", () => {
-    return agent
-    .get("/api/auth/identify")
-    .expect(200)
-    .expect(user)
-})
-    */

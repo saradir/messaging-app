@@ -1,58 +1,77 @@
-import sessions from "../tests/sessions"; // TODO: replace sessions array with session store
-import users from "../tests/users";
+import prisma from "../config/prisma.js";
+import bcrypt from "bcryptjs";
+import passport from "passport";
 
 
-export function register(req, res, next){
+export async function register(req, res, next){
     // presumably after verification and confirming uniqueness in a separate middleware
+
     const email = req.body.email // confirm unique
     const username = req.body.username; // confirm unique 
-    const password = req.body.password; // TODO: hash password
+    const password = req.body.password; 
 
-    const id = crypto.randomUUID(); // leave to db later
-
-    const user = {email, username, password, id}
-    users.push(user);
-    return res.status(201).json({
+    try{
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const users = await prisma.user.findMany();
+        const user = await prisma.user.create({
+            data:{
+                email,
+                username,
+                hashedPassword
+            }
+        });
+        console.log(user);
+        // TODO: return sanitzed user object
+        return res.status(201).json({
         success: true
-    });
+        });
+    }catch (err){
+        next(err);
+    }
 }
 
-export function login(req, res, next){
-    const user = users.find(u => u.email === req.body.email);
+export  function login(req, res, next){
 
-    if(!user) return res.status(401).json({
-        success: false, message: "Invalid Credentials"
+    passport.authenticate("local", (err, user, info) => {
+        if (err) {
+        return next(err);
+        }
+
+        if(!user) return res.status(401).json({
+            success: false, message: "Invalid Credentials"
+        });
+    
+
+    req.logIn(user, err => {
+      if (err) {
+        return next(err);
+      }
+        return res.json({
+            success: true,
+            user
+        });
     });
-    console.log("found user")
-
-    const hashedpassword = user.password;
-    if(req.body.password !== hashedpassword) return res.status(401).json({
-        success: false, message: "Invalid Credentials"
-    });
-
-    console.log("confirmed password")
-    const newSession = {id: crypto.randomUUID(), userId: user.id}
-    sessions.push(newSession);
-    console.log("created session");
-    res.locals.currentuser = user;
-    console.log("attached user")
-    return res
-    .cookie("sessionId", newSession.id,{
-          httpOnly: true,
-        sameSite: "lax",
-        secure: false // true in production over HTTPS
-
-    })
-    .status(200)
-    .json({success: true});
+    })(req, res, next);
 }
+
+
+
 
 export function logout(req, res, next){
-    return;
+    req.logout((err) => {
+        if(err){
+            return next(err);
+        }
+    return res.status(200).json({
+        success: true
+    });
+    });
 }
 
 export function identify(req, res, next){
-    // should also have req.user by now
-    if(!req.user) return res.status(401);
+    //TODO: sanitize user
+    if(!req.user) return res.status(401).json({
+        success:false, message: "Operation failed"
+    });
     return res.status(200).json(req.user);
 }

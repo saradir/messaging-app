@@ -1,1 +1,2 @@
-export default  sessions = [];
+const sessions = [];
+export default sessions;
