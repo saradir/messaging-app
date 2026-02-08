@@ -6,9 +6,88 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
+ model User {
+
   id             Int    @id @default(autoincrement())
+
   email          String @unique
+
   username       String @unique
+
   hashedPassword String
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+  memberships Membership[]
+  messages Message[]
+  contacts Contact[] @relation("ContactOwner")
+  contactedBy Contact[] @relation("ContactTarget")
+
 }
+
+model Contact{
+  ownerId Int
+  contactId Int
+  createdAt DateTime @default(now())
+
+  owner User @relation("ContactOwner", fields: [ownerId], references: [id])
+  contact User @relation("ContactTarget", fields: [contactId], references: [id])
+
+  @@id([ownerId, contactId])
+}
+
+
+model Membership {
+
+  userId Int
+
+  conversationId Int
+
+  lastReadAt DateTime?
+
+  role String
+
+  user User @relation(fields:[userId], references: [id])
+  conversation Conversation @relation(fields:[conversationId], references: [id])
+
+  @@id([userId, conversationId])
+
+}
+
+
+model Conversation {
+
+  id Int @id @default(autoincrement())
+
+  memberships Membership[]
+  participantHash String @unique
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+}
+
+
+model Message {
+
+  id Int @id @default(autoincrement())
+
+  content String?
+
+  author User @relation(fields:[authorId], references: [id])
+
+  authorId Int
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+
+  conversationId Int
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+} 
