@@ -9,8 +9,6 @@ import passport from "passport";
 import "../config/passport.js";
 
 const app = express();
-
-
 const agent = request.agent(app);
 app.use(cookieParser());
 app.use(express.json());
@@ -26,6 +24,7 @@ app.use("/api/auth", authRouter);
 
 // error handler
 app.use((err, req, res, next) => {
+  console.error(err);
   res.status(500).json({
     message: err.message,
     name: err.name,

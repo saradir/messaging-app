@@ -46,12 +46,14 @@ model Membership {
 
   lastReadAt DateTime?
 
-  role String
+  role MembershipRole @default(member)
 
   user User @relation(fields:[userId], references: [id])
   conversation Conversation @relation(fields:[conversationId], references: [id])
 
   @@id([userId, conversationId])
+  @@index([userId])
+  @@index([conversationId])
 
 }
 
@@ -90,4 +92,13 @@ model Message {
 
   updatedAt DateTime @updatedAt
 
+  @@index([conversationId, createdAt])
+
+
 } 
+
+
+enum MembershipRole {
+  member
+  admin
+}
