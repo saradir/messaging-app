@@ -40,8 +40,6 @@ describe("Vertical Slice", () =>{
                     hashedPassword: '1234'
             }
         });
-
-        console.log(userA, userB);
     });
 
 
@@ -59,7 +57,6 @@ describe("Vertical Slice", () =>{
         expect(res.body).toHaveProperty("data.id");
         const convId = res.body.data.id;
 
-        console.log(convId);
         // Send message
         await agent
         .post(`/api/conversations/${convId}/messages`)

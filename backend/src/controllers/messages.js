@@ -40,7 +40,9 @@ export async function create(req, res, next){
 // Fetch messsages by conversation ID
 export async function index(req, res, next){
 
-    const conversationId = Number(req.params.conversationId);
+
+const limit = Math.min(Number(req.query.limit) || 50, 100);
+const conversationId = Number(req.params.conversationId);
     try{
         //Authorize
         const membership = await prisma.membership.findUnique({
@@ -60,7 +62,9 @@ export async function index(req, res, next){
             where: {
                 conversationId
             },
-            orderBy: { createdAt: "asc" }
+
+            orderBy: { createdAt: "asc" },
+            take: limit
          })
 
          return res.status(200).json({
