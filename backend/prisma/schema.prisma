@@ -6,97 +6,63 @@ datasource db {
   provider = "postgresql"
 }
 
- model User {
-
-  id             Int    @id @default(autoincrement())
-
-  email          String @unique
-
-  username       String @unique
-
+model User {
+  id             Int          @id @default(autoincrement())
+  email          String       @unique
+  username       String       @unique
   hashedPassword String
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
-  memberships Membership[]
-  messages Message[]
-  contacts Contact[] @relation("ContactOwner")
-  contactedBy Contact[] @relation("ContactTarget")
-
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  contactedBy    Contact[]    @relation("ContactTarget")
+  contacts       Contact[]    @relation("ContactOwner")
+  memberships    Membership[]
+  messages       Message[]
 }
 
-model Contact{
-  ownerId Int
+model Contact {
+  ownerId   Int
   contactId Int
   createdAt DateTime @default(now())
-
-  owner User @relation("ContactOwner", fields: [ownerId], references: [id])
-  contact User @relation("ContactTarget", fields: [contactId], references: [id])
+  contact   User     @relation("ContactTarget", fields: [contactId], references: [id])
+  owner     User     @relation("ContactOwner", fields: [ownerId], references: [id])
 
   @@id([ownerId, contactId])
 }
 
-
 model Membership {
-
-  userId Int
-
+  userId         Int
   conversationId Int
-
-  lastReadAt DateTime?
-
-  role MembershipRole @default(member)
-
-  user User @relation(fields:[userId], references: [id])
-  conversation Conversation @relation(fields:[conversationId], references: [id])
+  lastReadAt     DateTime?
+  role           MembershipRole @default(member)
+  conversation   Conversation   @relation(fields: [conversationId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
 
   @@id([userId, conversationId])
   @@index([userId])
   @@index([conversationId])
-
 }
-
 
 model Conversation {
-
-  id Int @id @default(autoincrement())
-
-  memberships Membership[]
-  participantHash String @unique
-
-  messages Message[]
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
-
+  id              Int          @id @default(autoincrement())
+  participantHash String       @unique
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  memberships     Membership[]
+  messages        Message[]
 }
 
-
 model Message {
-
-  id Int @id @default(autoincrement())
-
-  content String?
-
-  author User @relation(fields:[authorId], references: [id])
-
-  authorId Int
-
-  conversation Conversation @relation(fields: [conversationId], references: [id])
-
+  id             Int          @id @default(autoincrement())
+  content        String?
+  authorId       Int
   conversationId Int
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  author         User         @relation(fields: [authorId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
 
   @@index([conversationId, createdAt])
-
-
-} 
-
+}
 
 enum MembershipRole {
   member

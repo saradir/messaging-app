@@ -1,0 +1,28 @@
+{
+  "name": "messagingapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:db": "cd backend && npx prisma dev --name message_app_db",
+    "dev:server": "cd backend && npm run dev",
+    "dev:client": "cd frontend && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saradir/messaging-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/saradir/messaging-app/issues"
+  },
+  "homepage": "https://github.com/saradir/messaging-app#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

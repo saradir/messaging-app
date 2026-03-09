@@ -7,5 +7,6 @@ const origins = (process.env.CORS_ORIGINS || "s")
                 .filter(s => s);
 export const corsOptions = {
   origin: origins,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  credentials: true
 };

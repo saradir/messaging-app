@@ -25,6 +25,7 @@ app.get("/", (req, res) =>{
 })
 
 app.use("/api/auth", authRouter);
+console.log("allowed:",process.env.CORS_ORIGINS)
 
 
 app.listen(PORT, () => console.log(`Server started on ${PORT}`));
