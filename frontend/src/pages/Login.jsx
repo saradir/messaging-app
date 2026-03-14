@@ -1,11 +1,13 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { MessageBox } from "../components/MessageBox";
 
 export default function Login(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [status, setStatus] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const {setCurrentUser} = useContext(AuthContext);
     const navigate = useNavigate();
@@ -30,6 +32,7 @@ export default function Login(){
             const data = await response.json();
             if (!response.ok) {
                 setMessage(data.message || "Login failed");
+                setStatus('error')
             
             return;
             }
@@ -49,7 +52,8 @@ if(submitting) return <p>Logging in...</p>
 
 
     return(
-        <div>
+        <>
+            {message && <MessageBox type={status}>{message}</MessageBox>}
             <form className="login-form" method="post" onSubmit={onSubmit}>
                 <label htmlFor="email">Email: </label>
                 <input type="email" id="email" name="email" required value={email} onChange={(e) => setEmail(e.target.value)}></input>
@@ -57,7 +61,7 @@ if(submitting) return <p>Logging in...</p>
                 <input type="password" id="password" name="password" required value={password} onChange={(e) => setPassword(e.target.value)}></input>
                 <button type="submit" disabled={!email || !password} >Login</button>
             </form>
-            <p>{message}</p>
-        </div>
+            
+        </>
     )
 }
