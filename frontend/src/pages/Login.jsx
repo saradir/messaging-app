@@ -36,7 +36,9 @@ export default function Login(){
             
             return;
             }
+            console.log(data.user);
             setCurrentUser(data.user);
+            
             navigate("/");
         
         } catch (err) {
