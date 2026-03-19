@@ -4,6 +4,8 @@ import 'dotenv/config';
 import { corsOptions } from "./config/cors-options.js";
 import session from "express-session";
 import authRouter  from "./routers/auth.router.js";
+import conversationsRouter from "./routers/conversations.js";
+
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import './config/passport.js';
@@ -25,7 +27,7 @@ app.get("/", (req, res) =>{
 })
 
 app.use("/api/auth", authRouter);
-console.log("allowed:",process.env.CORS_ORIGINS)
+app.use("/api/conversations", conversationsRouter);
 
 
 app.listen(PORT, () => console.log(`Server started on ${PORT}`));

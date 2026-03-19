@@ -28,8 +28,6 @@ function App() {
         if(response.ok){
           const data = await response.json();
           setCurrentUser(data);
-          console.log("ok");
-          console.log(data);
         }
       } catch (err) {
         console.error("Error contacting /auth/identify: ", err);
