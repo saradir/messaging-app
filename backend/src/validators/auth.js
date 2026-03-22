@@ -1,7 +1,7 @@
 import { body } from "express-validator"
 import prisma from "../config/prisma.js";
 
-const PASSWORD_REGEX = /^[a-zA-Z0-9_!@#$%^&*()-+?.]{4,20}$/;
+const PASSWORD_REGEX = /^[a-zA-Z0-9_!@#$%^&*()+?.-]{4,20}$/;
 
 export const registrationValidator = [
     body("email")
@@ -33,9 +33,10 @@ export const registrationValidator = [
         ,
     body("confirmPassword")
         .trim()
-        .notEmpty()
+        .notEmpty().withMessage("Missing value").bail()
         .custom( (pass, {req} ) =>{
             if (pass !== req.body.password) throw new Error("Passwords must match")
+            return true;
         }),
 ]
 
