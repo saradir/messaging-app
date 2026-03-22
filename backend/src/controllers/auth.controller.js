@@ -12,7 +12,6 @@ export async function register(req, res, next){
 
     try{
         const hashedPassword = await bcrypt.hash(password, 10);
-        const users = await prisma.user.findMany();
         const user = await prisma.user.create({
             data:{
                 email,
@@ -20,7 +19,6 @@ export async function register(req, res, next){
                 hashedPassword
             }
         });
-        console.log(user);
         // TODO: return sanitzed user object
         return res.status(201).json({
         success: true
