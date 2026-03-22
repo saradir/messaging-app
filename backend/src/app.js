@@ -5,6 +5,7 @@ import { corsOptions } from "./config/cors-options.js";
 import session from "express-session";
 import authRouter  from "./routers/auth.router.js";
 import conversationsRouter from "./routers/conversations.js";
+import contactsRouter from "./routers/contacts.js"
 
 import cookieParser from "cookie-parser";
 import passport from "passport";
@@ -28,6 +29,7 @@ app.get("/", (req, res) =>{
 
 app.use("/api/auth", authRouter);
 app.use("/api/conversations", conversationsRouter);
+app.use("/api/contacts", contactsRouter);
 
 
 app.listen(PORT, () => console.log(`Server started on ${PORT}`));
