@@ -23,7 +23,7 @@ export async function startConversation(userId){
 
 export async function fetchMessages(conversationId){
 
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
         credentials: "include"
     
     });
