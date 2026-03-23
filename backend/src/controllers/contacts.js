@@ -5,7 +5,7 @@ import prisma from "../config/prisma.js";
 export async function findUser(req, res, next){
 
     const  identifier  = req.query.q;
-    console.log(identifier)
+
     try{
         const user = await prisma.user.findFirst({
             where: {
