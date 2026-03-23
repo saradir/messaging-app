@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { fetchMessages } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
+import { MessagesContainer } from "../components/MessagesContainer.jsx";
 
 export function Conversation(){
 
@@ -65,6 +66,7 @@ export function Conversation(){
         <div className="conversation-container">
             
             <p>Messages Loaded</p>
+            <MessagesContainer messages={messages} />
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )
