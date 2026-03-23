@@ -7,14 +7,15 @@ import { MessagesContainer } from "../components/MessagesContainer.jsx";
 export function Conversation(){
 
     const [loading, setLoading] = useState(true);
-    const [messages, setMessages] = useState(null);
+    const [sending, setSending] = useState(false);
+    const [messages, setMessages] = useState([]);
     const [error, setError] = useState(null)
 
     const { conversationId } = useParams();
 
     async function handleSubmitMessage(content){
 
-        console.log(content);
+        setSending(true);
         try {
             const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
                 method: "POST",
@@ -33,9 +34,17 @@ export function Conversation(){
                 return;
             }
 
+            const data = await response.json();
+            const newMessage = data.data;
+
+            setMessages(prev => [...prev, newMessage]);
+            console.log(newMessage, messages)
+
             
         } catch (error) {
             console.error(error);   
+        } finally{
+            setSending(false);
         }
     }
     
@@ -66,7 +75,10 @@ export function Conversation(){
         <div className="conversation-container">
             
             <p>Messages Loaded</p>
-            <MessagesContainer messages={messages} />
+            {sending
+                ?<p>Sending...</p>
+                :<MessagesContainer messages={messages} />
+            }       
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )
