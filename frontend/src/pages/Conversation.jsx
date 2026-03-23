@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { fetchMessages } from "../services/conversations.js"
+import { MessageComposer } from "../components/MessageComposer.jsx";
 
 export function Conversation(){
 
@@ -9,6 +10,34 @@ export function Conversation(){
     const [error, setError] = useState(null)
 
     const { conversationId } = useParams();
+
+    async function handleSubmitMessage(content){
+
+        console.log(content);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    content
+                })
+            });
+
+
+            if(!response.ok){
+                console.error(response.status)
+                return;
+            }
+
+            
+        } catch (error) {
+            console.error(error);   
+        }
+    }
+    
 
     useEffect(() => {
         async function loadMessages(){
@@ -30,9 +59,13 @@ export function Conversation(){
 
     if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
-    console.log("Messages:", messages);
 
     return(
-        <p>Messages Loaded</p>
+
+        <div className="conversation-container">
+            
+            <p>Messages Loaded</p>
+            <MessageComposer handleSubmit={handleSubmitMessage} />
+        </div>
     )
 }
