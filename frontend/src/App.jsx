@@ -9,6 +9,7 @@ import Homepage from "./pages/Homepage";
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Contacts } from './pages/Contacts';
 import { Logout } from './pages/Logout';
+import { Conversation } from './pages/Conversation';
 
 
 function App() {
@@ -67,7 +68,8 @@ function App() {
           <Route element={ <ProtectedRoute/ >}>
             <Route path="/logout" element= {<Logout />} />
             <Route path="/" element= {<Homepage />} />
-            <Route path="/contacts" element={<Contacts />} />     
+            <Route path="/contacts" element={<Contacts />} />
+            <Route path="/conversations/:conversationId" element={ <Conversation />} />   
           </Route>
 
         </Routes>
