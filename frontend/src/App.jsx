@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import Register from './pages/Register';
 import Homepage from "./pages/Homepage";
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { Contacts } from './pages/Contacts';
+import { Logout } from './pages/Logout';
 
 
 function App() {
@@ -62,14 +64,12 @@ function App() {
             element= {<Register />}
           />
 
-          <Route
-            path="/"
-            element= {
-            <ProtectedRoute>
-              <Homepage />
-            </ProtectedRoute>           
-            }
-          />
+          <Route element={ <ProtectedRoute/ >}>
+            <Route path="/logout" element= {<Logout />} />
+            <Route path="/" element= {<Homepage />} />
+            <Route path="/contacts" element={<Contacts />} />     
+          </Route>
+
         </Routes>
       </AuthContext>
     </>
