@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ConversationList from "../components/ConversationList";
+import { Navbar } from "../components/Navbar";
 
 
 export default function Homepage(){
@@ -42,7 +43,7 @@ export default function Homepage(){
 
     return(
         <div className="main">
-
+            <Navbar/>
             <ConversationList conversations={ conversations }/>
         </div>
         
