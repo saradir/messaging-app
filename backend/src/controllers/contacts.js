@@ -1,7 +1,68 @@
 import prisma from "../config/prisma.js";
 
 
-export async function addContact(req, res, next){
+// Find user by email or username
+export async function findUser(req, res, next){
+
+    const  identifier  = req.query.q;
+    console.log(identifier)
+    try{
+        const user = await prisma.user.findFirst({
+            where: {
+                OR:[
+                    {username: identifier},
+                    {email: identifier}
+                ]
+                
+            },
+            select:{
+                id: true,
+                username: true,
+                email: true,
+
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: [user]
+        })
+
+    } catch(err){
+        next(err)
+    }
+}
+
+export async function index(req, res, next){
+
+    try {
+        const contacts = await prisma.contact.findMany({
+            where: {
+                ownerId: Number(req.user.id)
+            },
+            select: {
+                contact: {
+                    select: {
+                        username: true,
+                        id: true
+                    }
+                }
+            }
+        });
+        const flattenedContacts = contacts?.map(c => c.contact) || null
+
+        return res.status(200).json({
+            success: true,
+            data: flattenedContacts
+        });
+    
+            
+    } catch (err) {
+        next(err);        
+    }
+}
+
+export async function add(req, res, next){
 
     const contactId = Number(req.body.contactId);
 
