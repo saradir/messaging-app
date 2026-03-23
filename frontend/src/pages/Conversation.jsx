@@ -15,6 +15,7 @@ export function Conversation(){
 
     async function handleSubmitMessage(content){
 
+        if (sending) return;
         setSending(true);
         try {
             const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
@@ -30,19 +31,14 @@ export function Conversation(){
 
 
             if(!response.ok){
-                console.error(response.status)
-                return;
+               const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || `Failed: ${response.status}`);
             }
 
             const data = await response.json();
             const newMessage = data.data;
 
-            setMessages(prev => [...prev, newMessage]);
-            console.log(newMessage, messages)
-
-            
-        } catch (error) {
-            console.error(error);   
+            setMessages(prev => [...prev, newMessage]);            
         } finally{
             setSending(false);
         }
@@ -74,11 +70,10 @@ export function Conversation(){
 
         <div className="conversation-container">
             
-            <p>Messages Loaded</p>
-            {sending
-                ?<p>Sending...</p>
-                :<MessagesContainer messages={messages} />
-            }       
+            
+                
+            <MessagesContainer messages={messages} />
+                 
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )

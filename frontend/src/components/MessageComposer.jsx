@@ -3,9 +3,14 @@ import { useState } from "react";
 export function MessageComposer({handleSubmit}){
     const [input, setInput] = useState('');
 
-    function submitForm(e){
+    async function submitForm(e){
         e.preventDefault();
-        handleSubmit(input);
+        try{
+            await handleSubmit(input);
+            setInput('');
+        } catch(err){
+            console.error(err);
+        }
     }
     return(       
         <form className="message-input" onSubmit={submitForm}>
