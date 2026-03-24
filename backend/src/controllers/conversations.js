@@ -23,7 +23,7 @@ export async function index(req, res, next){
                             },
                         },                    
                         messages: {
-                            select: { id: true, createdAt: true, authorId: true },
+                            select: { id: true, createdAt: true, authorId: true, content: true },
                             orderBy: {createdAt: "desc"},
                             take: 1
                         },
