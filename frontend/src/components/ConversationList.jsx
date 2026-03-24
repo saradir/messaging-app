@@ -1,3 +1,4 @@
+import { ConversationRow } from "./ConversationRow";
 
 function ConversationList({ conversations }){
 
@@ -7,15 +8,7 @@ function ConversationList({ conversations }){
 
         <div className="conversation-list">
             { conversations.map( c => (
-                <div key={c.id} className="conversation" >
-                    <div className="conversation-title">
-                        
-                    </div>
-
-                    <div className="conversation-preview">
-                        {c.lastMessage?.content || ""}
-                    </div>
-                </div>
+                < ConversationRow key={c.id} conversation={c} />
             ))}
         </div>     
     )
