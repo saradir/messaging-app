@@ -1,7 +1,8 @@
+import "../styles/ContactsList.css";
 
 function ContactsList({ contacts }){
 
-    if(!contacts || contacts.length === 0) return <p>No contacts yet</p>
+    if(!contacts || contacts.length === 0) return <div className="empty-state">No contacts yet</div>
     
     return(
 

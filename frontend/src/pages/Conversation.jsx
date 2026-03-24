@@ -4,6 +4,8 @@ import { fetchMessages } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
 import { MessagesContainer } from "../components/MessagesContainer.jsx";
 
+import "../styles/Conversation.css";
+
 export function Conversation(){
 
     const [loading, setLoading] = useState(true);

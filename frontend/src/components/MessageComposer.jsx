@@ -1,4 +1,5 @@
 import { useState } from "react";
+import  "../styles/MessageComposer.css"
 
 export function MessageComposer({handleSubmit}){
     const [input, setInput] = useState('');

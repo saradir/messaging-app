@@ -1,0 +1,8 @@
+.search-results {
+  display: flex;
+  flex-direction: column;
+
+  background: var(--bg-panel);
+  flex: 1;
+  overflow-y: auto;
+}

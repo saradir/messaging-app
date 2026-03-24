@@ -1,0 +1,34 @@
+.message-container {
+  display: flex;
+  padding: 0 0.25rem;
+}
+
+.message-container.left {
+  justify-content: flex-start;
+}
+
+.message-container.right {
+  justify-content: flex-end;
+}
+
+.message-content {
+  max-width: 60%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+
+  word-break: break-word;
+}
+
+.message-container.left .message-content {
+  background: var(--bg-panel);
+  color: var(--text-main);
+}
+
+.message-container.right .message-content {
+  background: var(--accent-soft);
+  color: var(--text-main);
+}

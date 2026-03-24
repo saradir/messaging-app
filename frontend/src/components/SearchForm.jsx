@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState } from "react";
+import "../styles/SearchForm.css";
 
 export function SearchForm({handleSearch, setSearchMode, searchMode}){
 

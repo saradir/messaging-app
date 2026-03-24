@@ -1,6 +1,8 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
+import "../styles/MessageBalloon.css"
+
 export function MessageBalloon({ message }){
     const { currentUser} = useContext(AuthContext);
     const belongsToCurrentUser = message.authorId === currentUser.id;

@@ -1,8 +1,9 @@
 import { useState, useEffect} from "react"
-import ContactsList
- from "../components/ContactsList";
+import ContactsList from "../components/ContactsList";
 import { SearchForm } from "../components/SearchForm";
 import { SearchResults } from "../components/SearchResults";
+import "../styles/Contacts.css";
+
 export function Contacts(){
 
     const [loading, setLoading] = useState(true);

@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom"
 
+import "../styles/ConversationRow.css";
+
+
 export function ConversationRow({conversation}){
     const navigate = useNavigate();
 

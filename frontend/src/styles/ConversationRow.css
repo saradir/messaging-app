@@ -1,0 +1,33 @@
+.conversation-row {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  gap: 0.25rem;
+
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.conversation-row:hover {
+  background: var(--bg-hover);
+}
+
+.conversation-row:active {
+  background: var(--bg-active);
+}
+
+.conversation-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.conversation-preview {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

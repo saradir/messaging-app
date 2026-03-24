@@ -1,3 +1,5 @@
+import "../styles/UserRow.css";
+
 export function UserRow( {user, onClick, onView} ){
     return(
         <div className="user-row" onClick={() => onClick(user.id)} >

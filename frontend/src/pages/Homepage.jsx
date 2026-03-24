@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import ConversationList from "../components/ConversationList";
 import { Navbar } from "../components/Navbar";
 
+import "../styles/Homepage.css";
 
 export default function Homepage(){
 
