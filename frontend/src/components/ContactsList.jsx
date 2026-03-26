@@ -1,4 +1,5 @@
 import "../styles/ContactsList.css";
+import { UserRow } from "./UserRow";
 
 function ContactsList({ contacts }){
 
@@ -8,13 +9,7 @@ function ContactsList({ contacts }){
 
         <div className="contact-list">
             { contacts.map( c => (
-                <div key={c.id} className="contact" >
-                    <div className="contact-title">
-                        {c.username}
-                    </div>
-
-
-                </div>
+                < UserRow user={c} />
             ))}
         </div>     
     )
