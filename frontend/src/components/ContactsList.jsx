@@ -9,7 +9,7 @@ function ContactsList({ contacts }){
 
         <div className="contact-list">
             { contacts.map( c => (
-                < UserRow user={c} />
+                < UserRow key={c.id} user={c} />
             ))}
         </div>     
     )
