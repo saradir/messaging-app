@@ -40,19 +40,10 @@ export function Contacts(){
 
 
     useEffect(() => {
-        async function fetchContacts(){
+        async function loadContacts(){
             try{
-                const response = await fetch(`${import.meta.env.VITE_API_SERVER}/contacts`,{
-                credentials: "include"
-                });
-
-                if(!response.ok){
-                    setError("Failed to fetch contacts");
-                    console.error(response.status, ": Failed to fetch contacts");
-                }
-
-                const data = await response.json();
-                setContacts(data.data);
+                const contacts = await fetchContacts();
+                setContacts(contacts);
             } catch (err){
                 setError(err);
                 console.error("Error: ", err);
@@ -61,7 +52,7 @@ export function Contacts(){
             }
         }
         
-        fetchContacts();
+        loadContacts();
     }, []);
 
     if(error) return <p>{error}</p>
