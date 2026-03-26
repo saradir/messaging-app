@@ -44,7 +44,8 @@ export async function index(req, res, next){
                 contact: {
                     select: {
                         username: true,
-                        id: true
+                        id: true,
+                        email: true
                     }
                 }
             }

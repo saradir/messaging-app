@@ -3,6 +3,7 @@ import "../styles/ContactProfile.css"
 export function ContactProfile({contact, isInContacts, onAdd}){
 
     const inContacts = isInContacts(contact.id);
+    console.log(contact.email)
 
     if (!contact) return null;
     return (
