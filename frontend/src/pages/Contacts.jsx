@@ -4,7 +4,7 @@ import { SearchForm } from "../components/SearchForm";
 import { SearchResults } from "../components/SearchResults";
 import { ContactProfile } from "../components/ContactProfile";
 import { Modal } from "../components/Modal";
-import { addContact, fetchContacts } from "../services/contacts";
+import { addContact, fetchContacts, removeContact } from "../services/contacts";
 import { startConversation } from "../services/conversations"
 import "../styles/Contacts.css";
 import { useModal } from "../hooks/useModal";
@@ -19,6 +19,24 @@ export function Contacts(){
     const [searchResults, setSearchResults] = useState(null);
     const [searchMode, setSearchMode] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [pending, setPending] = useState(false);
+
+    async function handleRemoveContact(contactId){
+
+        setPending(true);
+
+        try{
+            const result = await removeContact(contactId);
+            if(result){
+                const newContacts = contacts.filter(c => c.id !== contactId);
+                setContacts(newContacts);
+            }
+        } catch (err){
+            console.error(err)
+        } finally{
+            setPending(false);
+        }
+    }
 
     async function handleRowClick(userId){       
         const {id} = await startConversation(userId);
@@ -37,13 +55,20 @@ export function Contacts(){
     }
 
     async function handleAdd(id){
+
+        setPending(true);
         try{
-            const contact = await addContact(id);
-            if(contact) setContacts(prev => [...prev, contact]);
+            const result = await addContact(id);
+
+            if(result.success){
+                 setContacts(prev => [...prev, result.data]);
+            }
+            
         } catch (error){
             console.error(error.message);
+        } finally {
+            setPending(false);
         }
-
     }
 
 
@@ -99,12 +124,12 @@ export function Contacts(){
 
             {searchMode
             ?<SearchResults contacts={searchResults} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} />
-            :<ContactsList contacts={contacts} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick}/>
+            :<ContactsList contacts={contacts} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} />
             }
 
             { contactProfile.isOpen &&
                 <Modal  onClose={contactProfile.close}>
-                    <ContactProfile contact={selectedUser} isInContacts={isInContacts} onAdd={handleAdd} />
+                    <ContactProfile contact={selectedUser} isInContacts={isInContacts(selectedUser.id)} onAdd={handleAdd} onRemove={handleRemoveContact} pending={pending} />
                 </Modal>
             }
 

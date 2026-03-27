@@ -1,10 +1,9 @@
 import "../styles/ContactProfile.css"
 
-export function ContactProfile({contact, isInContacts, onAdd}){
+export function ContactProfile({contact, isInContacts, onAdd, onRemove, pending}){
 
-    const inContacts = isInContacts(contact.id);
-    console.log(contact.email)
 
+ 
     if (!contact) return null;
     return (
         <div className="contact-profile">
@@ -19,7 +18,10 @@ export function ContactProfile({contact, isInContacts, onAdd}){
             </div>
 
             <div className="profile-controls">
-                <button className="add-button" disabled={inContacts} onClick={() => onAdd(contact.id)}>Add</button>
+                {isInContacts
+                    ?<button className="remove-button" disabled={pending} onClick={() => onRemove(contact.id)}>Remove</button>
+                    :<button className="add-button" disabled={pending}  onClick={() => onAdd(contact.id)}>Add</button>
+                }
             </div>
 
         </div>

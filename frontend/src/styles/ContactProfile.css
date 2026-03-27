@@ -53,6 +53,12 @@
   background: var(--accent-hover);
 }
 
-.profile-controls button:hover {
-  background: var(--bg-active);
+.remove-button {
+    background-color: transparent;
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+}
+
+.remove-button:hover {
+    background-color: rgba(255, 107, 107, 0.1);
 }

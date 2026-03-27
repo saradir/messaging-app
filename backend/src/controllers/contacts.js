@@ -107,7 +107,7 @@ export async function add(req, res, next){
 
         return res.status(200).json({
             success: true,
-            data: contact
+            data: contact.contact
         });
     } catch(err){
         next(err)
