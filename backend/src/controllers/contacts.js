@@ -105,3 +105,18 @@ export async function add(req, res, next){
     }
 
 }
+
+export async function remove(req, res, next){
+
+    const contactId = Number(req.params.contactId);
+
+    await prisma.contact.deleteMany({
+            where: {
+                ownerId: req.user.id,
+                contactId: contactId
+            }
+        });
+
+    return res.status(204).end();
+}
+
