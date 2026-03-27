@@ -32,6 +32,22 @@ app.use("/api/conversations", conversationsRouter);
 app.use("/api/contacts", contactsRouter);
 
 
+app.use((err, req, res, next) => {
+    console.error(err);
+
+    if (err.code === "P2025") {
+        return res.status(404).json({
+            success: false,
+            message: "Resource not found"
+        });
+    }
+
+    res.status(err.status || 500).json({
+        success: false,
+        message: err.message || "Internal server error"
+    });
+});
+
 app.listen(PORT, () => console.log(`Server started on ${PORT}`));
 
 export default app;
