@@ -93,6 +93,15 @@ export async function add(req, res, next){
                 ownerId: req.user.id,
                 contactId: contactId
                 
+            },
+            select: {
+                contact: {
+                    select: {
+                        username: true,
+                        id: true,
+                        email: true
+                    }
+                }
             }
         })
 
