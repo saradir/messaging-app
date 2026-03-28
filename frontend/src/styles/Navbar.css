@@ -22,7 +22,7 @@
   color: var(--text-main);
 }
 
-.navbar .Chats {
+.navbar .active {
   font-weight: 600;
   color: var(--text-main);
 }

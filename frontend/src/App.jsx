@@ -10,6 +10,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Contacts } from './pages/Contacts';
 import { Logout } from './pages/Logout';
 import { Conversation } from './pages/Conversation';
+import { Navbar } from './components/Navbar';
 
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
 
 
       <AuthContext value={{currentUser, setCurrentUser}}>
+        <Navbar/>
         <Routes>
 
           
