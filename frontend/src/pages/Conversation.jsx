@@ -1,52 +1,65 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { fetchMessages } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
 import { MessagesContainer } from "../components/MessagesContainer.jsx";
+import { AuthContext } from "../context/AuthContext";
 
 import "../styles/Conversation.css";
 
 export function Conversation(){
 
     const [loading, setLoading] = useState(true);
-    const [sending, setSending] = useState(false);
     const [messages, setMessages] = useState([]);
     const [error, setError] = useState(null)
+    const { currentUser} = useContext(AuthContext);
 
     const { conversationId } = useParams();
 
     async function handleSubmitMessage(content){
 
-        if (sending) return;
-        setSending(true);
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    content
-                })
-            });
+        const tempId = crypto.randomUUID();
+        const tempMessage = {authorId: currentUser.id, content, status: "pending", id: tempId }
+        setMessages(prev => [...prev, tempMessage]); // Update optimistically 
+       
+        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                content
+            })
+        });
 
 
-            if(!response.ok){
-               const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.message || `Failed: ${response.status}`);
-            }
+        if(!response.ok){
+            const errorData = await response.json().catch(() => null);
 
-            const data = await response.json();
-            const newMessage = data.data;
+            setMessages( prev => 
+            prev.map( m =>
+                m.id === tempId
+                ? {...m, status: "failed"}
+                : m
+            )
+            );
+            throw new Error(errorData?.message || `Failed: ${response.status}`);
 
-            setMessages(prev => [...prev, newMessage]);            
-        } finally{
-            setSending(false);
         }
-    }
-    
 
+        const data = await response.json();
+        const newMessage = data.data;
+
+        setMessages(prev =>
+            prev.map(m =>
+                m.id === tempId
+                ? newMessage
+                : m
+            )
+        );            
+    }
+      
     useEffect(() => {
         async function loadMessages(){
             try {
