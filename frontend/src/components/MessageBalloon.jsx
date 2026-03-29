@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 
 import "../styles/MessageBalloon.css"
 
-export function MessageBalloon({ message }){
+export function MessageBalloon({ message, onResend }){
     const { currentUser} = useContext(AuthContext);
     const belongsToCurrentUser = message.authorId === currentUser.id;
 
@@ -11,6 +11,19 @@ export function MessageBalloon({ message }){
         <div className={`message-container ${belongsToCurrentUser? "right" : "left"}`}>
             <div className="message-content">
                 {message.content}
+            </div>
+
+            <div className="message-status">
+
+                {message.status === "failed" 
+                    && <div><span className="failed-status">Delivery failed. Click to </span><button className="resend-button" onClick={() => onResend(message)}>resend</button></div>
+                }
+
+                 {message.status === "pending" 
+                    && <div><span className="pending-status">Sending... </span></div>
+                }
+
+
             </div>
         </div>
     )

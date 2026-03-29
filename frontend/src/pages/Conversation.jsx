@@ -87,7 +87,7 @@ export function Conversation(){
             
             
                 
-            <MessagesContainer messages={messages} />
+            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} />
                  
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
