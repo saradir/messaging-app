@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMessages } from "../services/conversations.js"
+import { fetchMessages, sendMessage } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
 import { MessagesContainer } from "../components/MessagesContainer.jsx";
 import { AuthContext } from "../context/AuthContext";
@@ -36,28 +36,44 @@ export function Conversation(){
             console.error("Failed to send message:", error);
             // update failed status
             setMessages( prev => 
-            prev.map( m =>
-                m.id === tempId
-                ? {...m, status: "failed"}
-                : m
-            )
+                prev.map( m =>
+                    m.id === tempId
+                    ? {...m, status: "failed"}
+                    : m
+                )
             );
-            throw new Error(errorData?.message || `Failed: ${response.status}`);
-
         }
 
-        const data = await response.json();
-        const newMessage = data.data;
-
-        setMessages(prev =>
-            prev.map(m =>
-                m.id === tempId
-                ? newMessage
-                : m
-            )
-        );            
     }
-      
+    
+    async function handleResendMessage(message){
+
+        setMessages( prev =>
+            prev.map( m => 
+                m.id === message.id
+                    ? { ...m, status: "pending"}
+                    : m
+            )
+        );
+
+        try{
+            const uploadedMessage= await sendMessage(conversationId, message.content);
+            setMessages(prev => [
+                ...prev.filter(m => m.id !== message.id),
+                uploadedMessage
+                ]);
+        } catch (error){
+                console.error(error);
+                setMessages( prev =>
+                    prev.map( m => 
+                        m.id === message.id
+                        ? { ...m, status: "failed"}
+                        : m
+                    )
+                );
+            }
+    }
+
     useEffect(() => {
         async function loadMessages(){
             try {
