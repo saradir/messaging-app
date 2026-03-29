@@ -37,3 +37,28 @@ export async function fetchMessages(conversationId){
         return data.data;
 
 }
+
+export async function sendMessage(conversationId, content){
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                content
+            })
+        });
+
+
+        if(!response.ok){
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.message || `Operation failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.data;
+    }
+
+
+        

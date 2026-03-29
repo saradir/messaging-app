@@ -22,21 +22,19 @@ export function Conversation(){
         const tempMessage = {authorId: currentUser.id, content, status: "pending", id: tempId }
         setMessages(prev => [...prev, tempMessage]); // Update optimistically 
        
-        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                content
-            })
-        });
+        try{
+            const uploadedMessage = await sendMessage(conversationId, content);
+            setMessages(prev =>
+                prev.map(m =>
+                    m.id === tempId
+                    ? uploadedMessage
+                    : m
+                )
+            ); 
+        } catch (error) {
 
-
-        if(!response.ok){
-            const errorData = await response.json().catch(() => null);
-
+            console.error("Failed to send message:", error);
+            // update failed status
             setMessages( prev => 
             prev.map( m =>
                 m.id === tempId
