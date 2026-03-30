@@ -1,4 +1,4 @@
-import { body, query } from "express-validator"
+import { body, query, param } from "express-validator"
 
 
 export const validateSearchQuery = [
@@ -9,14 +9,21 @@ export const validateSearchQuery = [
         .notEmpty().withMessage("Query cannot be empty")
         .isLength({min:3, max:50})
     ,
-]
+];
 
-export const validateAddRemoveContact = [
+export const validateAddContact = [
 
     body("contactId")
         .exists().withMessage("contactId is required")
         .isInt().withMessage("contactId must be a number")
         .toInt(),
 
-]
+];
 
+export const validateRemoveContact = [
+    param("contactId")
+    .exists().withMessage("contactId is required")
+    .isInt().withMessage("contactId must be a number")
+    .toInt(),
+    
+]
