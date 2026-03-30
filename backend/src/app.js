@@ -28,8 +28,8 @@ app.get("/", (req, res) =>{
 })
 
 app.use("/api/auth", authRouter);
-app.use("/api/conversations", requireAuth, conversationsRouter);
-app.use("/api/contacts", requireAuth, contactsRouter);
+app.use("/api/conversations", conversationsRouter);
+app.use("/api/contacts", contactsRouter);
 
 
 app.use((err, req, res, next) => {

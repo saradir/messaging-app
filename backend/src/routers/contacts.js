@@ -2,8 +2,10 @@ import { Router } from "express";
 import * as contactController from "../controllers/contacts.js"
 import { validateAddRemoveContact, validateSearchQuery } from "../validators/contacts.js";
 import { handleValidationErrors } from "../middlewares/handleValidationErrors.js";
-const contactsRouter = Router();
+import { requireAuth } from "../middlewares/authenticate.js";
 
+const contactsRouter = Router();
+contactsRouter.use("/", requireAuth)
 contactsRouter.get("/", contactController.index) // fetch all contact of req.user
 contactsRouter.post("/", validateAddRemoveContact, handleValidationErrors, contactController.add)  // add new contact to req.user
 contactsRouter.get("/search", validateSearchQuery, handleValidationErrors, contactController.findUser)
