@@ -22,6 +22,7 @@ export async function resetDb() {
  
         prisma.message.deleteMany(),
         prisma.membership.deleteMany(),
+        prisma.contact.deleteMany(),
         prisma.conversation.deleteMany(),
         prisma.user.deleteMany(),
     ]);
