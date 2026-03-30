@@ -28,8 +28,19 @@ export async function resetDb() {
 }
 
 // Attach user object to req for authorization. Mount on app before routing.
-export async function testAuth (req, res, next)  {
-    const id = Number(req.headers["x-test-user-id"]);
-    req.user = { id }
-    next();
-    }
+export function testAuth(req, res, next) {
+  const rawId = req.headers["x-test-user-id"];
+
+  if (!rawId) {
+    return next(); // do nothing if header missing, avoids providing invalid user
+  }
+
+  const userId = Number(rawId);
+
+  if (!Number.isInteger(userId)) {
+    return next(); // ignore invalid values
+  }
+
+  req.user = { id: userId };
+  next();
+}
