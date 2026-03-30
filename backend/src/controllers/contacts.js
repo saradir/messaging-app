@@ -65,7 +65,7 @@ export async function index(req, res, next){
 
 export async function add(req, res, next){
 
-    const contactId = Number(req.body.contactId);
+    const contactId = req.body.contactId;
 
     if(req.user.id === contactId){
         return res.status(400).json({
@@ -88,36 +88,41 @@ export async function add(req, res, next){
             })
         }
 
-        const contact = await prisma.contact.create({
-            data:{
+        const row = await prisma.contact.upsert({
+            where: {
+                ownerId_contactId: {
                 ownerId: req.user.id,
-                contactId: contactId
-                
+                contactId,
+                },
             },
-            select: {
+            update: {},
+            create: {
+                ownerId: req.user.id,
+                contactId,
+            },
+            include: {
                 contact: {
-                    select: {
-                        username: true,
-                        id: true,
-                        email: true
-                    }
-                }
-            }
-        })
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                },
+                },
+            },
+        });
 
         return res.status(200).json({
             success: true,
-            data: contact.contact
+            data: row.contact
         });
     } catch(err){
-        next(err)
+       return next(err);
     }
-
 }
 
 export async function remove(req, res, next){
 
-    const contactId = Number(req.params.contactId);
+    const contactId = req.params.contactId;
 
     await prisma.contact.deleteMany({
             where: {
