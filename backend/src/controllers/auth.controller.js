@@ -16,11 +16,17 @@ export async function register(req, res, next){
                 email,
                 username,
                 hashedPassword
+            },
+            select:{
+                id: true,
+                username: true,
+                email: true
             }
         });
         // TODO: return sanitzed user object
         return res.status(201).json({
-        success: true
+        success: true,
+        data: user
         });
     }catch (err){
         next(err);
@@ -66,7 +72,7 @@ export function logout(req, res, next){
 }
 
 export function identify(req, res, next){
-    //TODO: sanitize user
+    
     if(!req.user) return res.status(401).json({
         success:false, message: "Operation failed"
     });
