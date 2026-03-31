@@ -42,7 +42,7 @@ export async function index(req, res, next){
 
 
 const limit = Math.min(Number(req.query.limit) || 50, 100);
-const {conversationId} = matchedData(conversationId);
+const { conversationId } = matchedData(req);
     try{
         //Authorize
         const membership = await prisma.membership.findUnique({
