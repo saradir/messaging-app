@@ -20,16 +20,16 @@ export function SearchForm({handleSearch, setSearchMode, searchMode}){
         <form className="search-form"   autoComplete="new-password" onSubmit={onSubmit}>
             <input
                 type="text"
-                  autoComplete="new-password"
-
+                autoComplete="new-password"
+                min={4}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Type username or email to look them up"
             />
 
-            {searchMode && <button type="button" onClick={handleAbort}>Back</button>}
+            {searchMode && <button type="button" onClick={handleAbort} >Back</button>}
 
-            <button type="submit">Search</button>
+            <button type="submit" disabled={query.length < 4}>Search</button>
         </form>
     )
 }
