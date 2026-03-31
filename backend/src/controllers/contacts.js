@@ -1,10 +1,10 @@
 import prisma from "../config/prisma.js";
-
+import { matchedData } from "express-validator";
 
 // Find user by email or username
 export async function findUser(req, res, next){
 
-    const  identifier  = req.query.q;
+    const  identifier  = matchedData(req).q;
 
     try{
         const user = await prisma.user.findFirst({
@@ -65,7 +65,7 @@ export async function index(req, res, next){
 
 export async function add(req, res, next){
 
-    const contactId = req.body.contactId;
+    const { contactId } = matchedData(req);
 
     if(req.user.id === contactId){
         return res.status(400).json({
@@ -122,7 +122,7 @@ export async function add(req, res, next){
 
 export async function remove(req, res, next){
 
-    const contactId = req.params.contactId;
+    const { contactId } = matchedData(req);
 
     await prisma.contact.deleteMany({
             where: {

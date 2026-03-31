@@ -1,8 +1,9 @@
 import prisma from "../config/prisma.js";
+import { matchedData } from "express-validator";
+
 
 // Fetch all conversations of current user
 export async function index(req, res, next){
-
 
     try {
         const memberships = await prisma.membership.findMany({
@@ -61,7 +62,8 @@ export async function index(req, res, next){
 
 // Fetch existing conversation or create new one if doesn't exist
 export async function startConversation(req, res, next){
-    const targetUserId = (req.body.targetUserId);
+
+    const { targetUserId } = matchedData(req);
 
     if (targetUserId === req.user.id) {
         return res.status(400).json({ success:false, message:"Cannot start a conversation with yourself" });

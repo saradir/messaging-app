@@ -1,9 +1,9 @@
 import prisma from "../config/prisma.js";
+import { matchedData } from "express-validator";
 
 export async function create(req, res, next){
 
-    const conversationId = (req.params.conversationId);
-
+    const { conversationId, content } = matchedData(req);
 
     //Authorize
     try{
@@ -23,7 +23,7 @@ export async function create(req, res, next){
         const message = await prisma.message.create({
             data:{
                 authorId: req.user.id,
-                content: req.body.content,
+                content,
                 conversationId
             }
         });
@@ -42,7 +42,7 @@ export async function index(req, res, next){
 
 
 const limit = Math.min(Number(req.query.limit) || 50, 100);
-const conversationId = (req.params.conversationId);
+const {conversationId} = matchedData(conversationId);
     try{
         //Authorize
         const membership = await prisma.membership.findUnique({

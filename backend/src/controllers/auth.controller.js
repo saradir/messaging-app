@@ -1,13 +1,13 @@
 import prisma from "../config/prisma.js";
 import bcrypt from "bcryptjs";
 import passport from "passport";
+import { matchedData } from "express-validator";
 
 
 export async function register(req, res, next){
 
-    const email = req.body.email; 
-    const username = req.body.username;  
-    const password = req.body.password; 
+    const data = matchedData(req);
+    const { email, username, password} = data;
 
     try{
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,7 +23,6 @@ export async function register(req, res, next){
                 email: true
             }
         });
-        // TODO: return sanitzed user object
         return res.status(201).json({
         success: true,
         data: user
@@ -72,7 +71,7 @@ export function logout(req, res, next){
 }
 
 export function identify(req, res, next){
-    
+
     if(!req.user) return res.status(401).json({
         success:false, message: "Operation failed"
     });
