@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { MessageBox } from "../components/MessageBox";
-
+import { Link } from "react-router-dom";
 import "../styles/Login.css"
 
 export default function Login(){
@@ -56,6 +56,7 @@ export default function Login(){
     return (
     <div className="auth-page">
         {message && <MessageBox type={status}>{message}</MessageBox>}
+        <p className="auth-switch">Not registered yet? <Link to="/register">Create an account</Link></p>
         <form className="login-form" method="post" onSubmit={onSubmit}>
         <label htmlFor="email">Email</label>
         <input
