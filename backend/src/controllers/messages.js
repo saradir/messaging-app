@@ -2,7 +2,7 @@ import prisma from "../config/prisma.js";
 
 export async function create(req, res, next){
 
-    const conversationId = Number(req.params.conversationId);
+    const conversationId = (req.params.conversationId);
 
 
     //Authorize
@@ -42,7 +42,7 @@ export async function index(req, res, next){
 
 
 const limit = Math.min(Number(req.query.limit) || 50, 100);
-const conversationId = Number(req.params.conversationId);
+const conversationId = (req.params.conversationId);
     try{
         //Authorize
         const membership = await prisma.membership.findUnique({

@@ -4,10 +4,9 @@ import passport from "passport";
 
 
 export async function register(req, res, next){
-    // presumably after verification and confirming uniqueness in a separate middleware
 
-    const email = req.body.email // confirm unique
-    const username = req.body.username; // confirm unique 
+    const email = req.body.email; 
+    const username = req.body.username;  
     const password = req.body.password; 
 
     try{

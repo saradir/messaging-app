@@ -61,7 +61,7 @@ export async function index(req, res, next){
 
 // Fetch existing conversation or create new one if doesn't exist
 export async function startConversation(req, res, next){
-    const targetUserId = Number(req.body.targetUserId);
+    const targetUserId = (req.body.targetUserId);
 
     if (targetUserId === req.user.id) {
         return res.status(400).json({ success:false, message:"Cannot start a conversation with yourself" });
