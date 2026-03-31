@@ -17,8 +17,8 @@ export const registrationValidator = [
     body("username")
         .trim()
         .notEmpty().withMessage("Username is required")
-        .matches(/^[a-zA-Z0-9_]{4,20}$/)
-        .toLowerCase().withMessage("Username must be 4–20 characters and contain only letters, numbers, or _")
+        .matches(/^[a-zA-Z0-9_-]{4,20}$/).withMessage("Username must be 4–20 characters and contain only letters, numbers, or _")
+        .toLowerCase()
         .bail()
         .custom(async (username) => {
             const isUnique = await confirmUnique("username", username);

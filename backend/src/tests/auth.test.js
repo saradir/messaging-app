@@ -31,7 +31,7 @@ app.use((err, req, res, next) => {
     code: err.code,     
   });
 });
-const randomPrefix = crypto.randomUUID();
+const randomPrefix = crypto.randomUUID().slice(0,10);
 const email = `${randomPrefix}-test@test.com`
 const username = `${randomPrefix}-test_user`
 const password = "1234"
@@ -40,7 +40,7 @@ test("auth flow works", async () => {
 
   await agent
     .post("/api/auth/register")
-    .send({ email, username, password })
+    .send({ email, username, password, confirmPassword: password })
     .expect(201);
 
   await agent
