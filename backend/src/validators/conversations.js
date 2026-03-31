@@ -13,6 +13,12 @@ export const validateCreateMessage = [
         .exists().withMessage("conversationId is required")
         .isInt().withMessage("conversationId must be a number")
         .toInt(),
+
+    body("content")
+        .trim()
+        .notEmpty().withMessage("Message cannot be empty")
+        .isLength({ min: 1, max: 2000 })
+        .withMessage("Message must be between 1 and 2000 characters")
 ]
 
 export const validateIndexMessages = [
