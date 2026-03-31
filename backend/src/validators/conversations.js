@@ -2,7 +2,7 @@ import { body, query, param } from "express-validator"
 
 
 export const validateStartConversation = [
-    body("targetContactId")
+    body("targetUserId")
         .exists().withMessage("contactId is required")
         .isInt().withMessage("contactId must be a number")
         .toInt(),
