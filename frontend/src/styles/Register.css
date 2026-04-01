@@ -24,3 +24,9 @@
   font-size: 0.8rem;
   color: #ff7b7b;
 }
+
+.register-form button:disabled{ 
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-hover);
+}

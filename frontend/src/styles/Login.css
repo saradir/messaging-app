@@ -62,3 +62,25 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+.auth-switch {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #a0a0a0; /* muted text */
+  text-align: center;
+}
+
+.auth-switch a {
+  color: #25d366; /* WhatsApp green */
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.auth-switch a:active {
+  opacity: 0.8;
+}
