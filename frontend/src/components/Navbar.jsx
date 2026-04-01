@@ -3,11 +3,11 @@ import { NavLink } from "react-router-dom";
 import "../styles/Navbar.css";
 
 
-export function Navbar(){
+export function Navbar({view, setView}){
     return(
         <nav className="navbar">
-            <NavLink to="/" className={({ isActive }) => isActive ? "nav-chats active" : "nav-chats"}>Chats</NavLink>
-            <NavLink to="/contacts" className={({ isActive }) => isActive ? "nav-contacts active" : "nav-contacts"}>Contacts</NavLink>
+            <button className={`nav-chats button ${view==="chats"? "active":""}`} onClick={() => setView("chats")}>Chats </button> 
+            <button  className={`nav-contacts button ${view==="contacts"? "active":""}`} onClick={() => setView("contacts")}>Contacts </button>
         </nav>
     )
 }
