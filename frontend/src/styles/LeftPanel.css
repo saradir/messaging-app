@@ -1,0 +1,24 @@
+.left-panel {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+    background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+    position: relative;
+}
+
+.left-panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--border-subtle),
+    transparent
+  );
+}

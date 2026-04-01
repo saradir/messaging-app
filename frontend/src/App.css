@@ -85,3 +85,55 @@ p {
 #root {
   min-height: 100vh;
 }
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-main);
+}
+
+.conversation-list,
+.contact-list,
+.search-results {
+  flex: 0 0 280px; /* fixed width sidebar */
+  overflow-y: auto;
+}
+
+
+
+.content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+:root {
+  /* Main surfaces */
+--bg-main: #0f2530;        /* was ~#06141b */
+  --bg-panel: #132833;       /* sidebar */
+  --bg-elevated: #10242e;    /* cards / inputs */
+
+  /* Interaction */
+  --bg-hover: #1b3442;
+  --bg-active: #234454;
+  --bg-selected: #1f3a48;
+
+  /* Text */
+  --text-main: #e6edf3;
+  --text-muted: #a8b4be;
+  --text-dim: #7f909b;
+
+  /* Borders */
+  --border-subtle: #2a3f4c;
+  --border-strong: #3a5565;
+
+  /* Accent (unchanged or slightly tuned) */
+  --accent: #25d366;
+  --accent-hover: #33db74;
+}

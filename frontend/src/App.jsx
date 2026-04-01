@@ -5,12 +5,11 @@ import './App.css'
 
 import Login from "./pages/Login";
 import Register from './pages/Register';
-import Homepage from "./pages/Homepage";
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { Contacts } from './pages/Contacts';
+import { AuthRoute } from './components/AuthRoute';
 import { Logout } from './pages/Logout';
 import { Conversation } from './pages/Conversation';
-import { Navbar } from './components/Navbar';
+import { AppLayout } from './components/AppLayout';
 
 
 function App() {
@@ -46,38 +45,25 @@ function App() {
 
   if(loading) return <p>Loading</p>;
   if(error) return <p>{error}</p>;
-  return(
-    <>
+  return (
+    <AuthContext value={{ currentUser, setCurrentUser }}>
+      <Routes>
+        <Route element={<AuthRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
 
-
-      <AuthContext value={{currentUser, setCurrentUser}}>
-        <Navbar/>
-        <Routes>
-
-          
-          <Route
-            path="/login"
-            element= {
-            
-            <Login />}
-          />
-
-          <Route
-            path="/register"
-            element= {<Register />}
-          />
-
-          <Route element={ <ProtectedRoute/ >}>
-            <Route path="/logout" element= {<Logout />} />
-            <Route path="/" element= {<Homepage />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/conversations/:conversationId" element={ <Conversation />} />   
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route index element={<p>Welcome</p>} />
+            <Route path="conversations/:conversationId" element={<Conversation />} />
           </Route>
 
-        </Routes>
-      </AuthContext>
-    </>
-  )
+          <Route path="/logout" element={<Logout />} />
+        </Route>
+      </Routes>
+    </AuthContext>
+  );
 
 }
 
