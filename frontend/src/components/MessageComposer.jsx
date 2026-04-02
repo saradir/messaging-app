@@ -19,7 +19,7 @@ export function MessageComposer({handleSubmit}){
 
             </textarea>
 
-            <button type="submit" className="submit-button">Send</button>
+            <button type="submit" className="submit-button" disabled={input.length < 1}>Send</button>
         </form>
     )
 }
