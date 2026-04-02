@@ -23,7 +23,6 @@ let userB = await createUser();
 let convId;
 describe("Test conversations router", () => {
     afterAll(async () => {
-        await resetDb();
         await prisma.$disconnect();
     });
     
@@ -46,6 +45,14 @@ describe("Test conversations router", () => {
         .send({content: "This is a test message"})
         .expect(201);
     });
+
+    test("reject empty message", async () => {
+        await agent 
+        .post(`/api/conversations/${convId}/messages`)
+        .set("x-test-user-id", userA.id)
+        .send({content: " "})
+        .expect(400);
+    })
 
     test("fetch conversations as userB", async () => {
         const res = await agent
