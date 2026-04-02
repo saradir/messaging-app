@@ -6,7 +6,8 @@ import session from "express-session";
 import authRouter  from "./routers/auth.router.js";
 import conversationsRouter from "./routers/conversations.js";
 import contactsRouter from "./routers/contacts.js"
-
+import { createServer } from "http";
+import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import './config/passport.js';
@@ -17,7 +18,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(session({ secret: "secret", resave: false, saveUninitialized: false}));
+
+const sessionMiddleware = session({
+  secret: "secret",
+  resave: false,
+  saveUninitialized: false,
+});
+
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -48,6 +56,26 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Server started on ${PORT}`));
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
 
+const wrap = (middleware) => (socket, next) =>
+  middleware(socket.request, {}, next);
+
+io.use(wrap(sessionMiddleware));
+io.use(wrap(passport.initialize()));
+io.use(wrap(passport.session()));
+
+io.on("connection", (socket) => {
+  console.log("session?", socket.request.session);
+  console.log("user?", socket.request.user);
+  console.log("socket connected", socket.id);
+});
+
+httpServer.listen(PORT);
 export default app;
