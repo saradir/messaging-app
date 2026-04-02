@@ -14,7 +14,7 @@ export function LeftPanel() {
             <Navbar view={view} setView={setView} />
 
             <Sidebar>
-                {view === "contacts" ? <Contacts /> : <Homepage />}
+                {view === "contacts" ? <Contacts selectedRow={selectedRow} setSelectedRow={setSelectedRow} /> : <Chats selectedRow={selectedRow} setSelectedRow={setSelectedRow} />}
             </Sidebar>
 
 

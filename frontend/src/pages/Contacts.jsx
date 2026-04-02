@@ -41,6 +41,8 @@ export function Contacts(){
     async function handleRowClick(userId){       
         const {id} = await startConversation(userId);
         navigate(`/conversations/${id}`);
+        setSelectedRow({type: "contact", id: userId})
+        
     }
 
     
@@ -124,7 +126,7 @@ export function Contacts(){
 
             {searchMode
             ?<SearchResults contacts={searchResults} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} />
-            :<ContactsList contacts={contacts} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} />
+            :<ContactsList contacts={contacts} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} selectedRow={selectedRow} />
             }
 
             { contactProfile.isOpen &&

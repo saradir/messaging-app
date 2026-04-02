@@ -1,6 +1,6 @@
 import "../styles/UserRow.css";
 
-export function UserRow( {user, viewUserProfile, onClick} ){
+export function UserRow( {user, viewUserProfile, onClick, isActive} ){
 
     function onView(e){
         e.stopPropagation();
@@ -10,7 +10,7 @@ export function UserRow( {user, viewUserProfile, onClick} ){
     return(
     <>
 
-        <div className="user-row" onClick={() => onClick(user.id)} >
+        <div className={isActive ? "user-row active" : "user-row"} onClick={() => onClick(user.id)} >
             <div className="left-side">
                 <div className="username">
                     {user.username}
