@@ -1,4 +1,4 @@
-import Homepage from "../pages/Homepage";
+import Chats from "../pages/Chats";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 import { Contacts } from "../pages/Contacts";
