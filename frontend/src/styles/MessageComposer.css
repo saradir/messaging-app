@@ -28,18 +28,3 @@
 .message-input textarea:focus {
   box-shadow: 0 0 0 1px var(--accent-soft);
 }
-
-.submit-button {
-  padding: 0.5rem 0.9rem;
-  border-radius: 6px;
-
-  background: var(--accent);
-  color: #0b141a;
-  font-weight: 500;
-
-  transition: background 0.15s ease;
-}
-
-.submit-button:hover {
-  background: var(--accent-hover);
-}
