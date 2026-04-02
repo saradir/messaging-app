@@ -50,3 +50,9 @@
 .search-form button[type="submit"]:hover {
   background: var(--accent-hover);
 }
+
+.search-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-hover);
+}

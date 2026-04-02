@@ -101,7 +101,7 @@ export default function Register(){
 
         {message && <MessageBox type={status}>{message}</MessageBox>}
 
-        <form className="login-form" method="post" onSubmit={onSubmit}>
+        <form className="register-form" method="post" onSubmit={onSubmit}>
             <label htmlFor="username">Username</label>
             <input
             type="text"
@@ -154,7 +154,7 @@ export default function Register(){
             <span className="field-error">{errors.confirmPassword}</span>
             )}
 
-            <button type="submit" disabled={!formData.email || !formData.password}>
+            <button className="register-button" type="submit" disabled={!formData.email || !formData.password}>
             Sign up
             </button>
         </form>

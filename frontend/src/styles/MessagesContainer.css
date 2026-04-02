@@ -4,10 +4,11 @@
   flex-direction: column;
   gap: 0.4rem;
   scroll-behavior: smooth;
+  min-height: 0;
 
   padding: 1rem;
   overflow-y: auto;
-
+  background: var(--bg-main);
   background: var(--bg-app);
 }
 

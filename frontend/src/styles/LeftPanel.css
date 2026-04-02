@@ -1,0 +1,65 @@
+.left-panel {
+  width: 355px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+    background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+    position: relative;
+}
+
+.left-panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--border-subtle),
+    transparent
+  );
+}
+
+.conversation-row,
+.user-row {
+  position: relative;
+  padding: 0.85rem 1rem;
+
+  display: flex;
+  gap: 0.75rem;
+
+  cursor: pointer;
+  background: transparent;
+
+  transition: background 0.15s ease;
+}
+
+.conversation-row:hover,
+.user-row:hover {
+  background: var(--bg-hover);
+}
+
+.conversation-row.active,
+.user-row.active {
+  background: var(--bg-selected);
+}
+
+.conversation-row.active:hover,
+.user-row.active:hover {
+  background: var(--bg-selected);
+}
+
+.conversation-row.active::before,
+.user-row.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+}

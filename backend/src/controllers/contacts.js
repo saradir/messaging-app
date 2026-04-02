@@ -22,10 +22,10 @@ export async function findUser(req, res, next){
 
             }
         });
-
+        const result = user? [user] : [];
         return res.status(200).json({
             success: true,
-            data: [user]
+            data: result
         })
 
     } catch(err){
