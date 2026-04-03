@@ -11,6 +11,7 @@ import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import './config/passport.js';
+import { registerSocketHandlers } from "./config/socket.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -70,12 +71,8 @@ const wrap = (middleware) => (socket, next) =>
 io.use(wrap(sessionMiddleware));
 io.use(wrap(passport.initialize()));
 io.use(wrap(passport.session()));
+registerSocketHandlers(io);
 
-io.on("connection", (socket) => {
-  console.log("session?", socket.request.session);
-  console.log("user?", socket.request.user);
-  console.log("socket connected", socket.id);
-});
 
 httpServer.listen(PORT);
 export default app;
