@@ -4,7 +4,7 @@ import { fetchMessages, sendMessage } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
 import { MessagesContainer } from "../components/MessagesContainer.jsx";
 import { AuthContext } from "../context/AuthContext";
-
+import { socket } from "../services/socket.js";
 import "../styles/Conversation.css";
 
 export function Conversation(){
@@ -75,6 +75,7 @@ export function Conversation(){
     }
 
     useEffect(() => {
+        if (!conversationId) return;
         async function loadMessages(){
             try {
                 const messages = await fetchMessages(conversationId);
@@ -88,9 +89,12 @@ export function Conversation(){
         }
 
         loadMessages();
+        socket.emit("conversation:join", conversationId);
+        return () => {
+            // later you may emit leave, but not required yet
+        };
 
     }, [conversationId]);
-
 
     if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
