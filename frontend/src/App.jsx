@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import './App.css'
-import { io } from "socket.io-client";
 import Login from "./pages/Login";
 import Register from './pages/Register';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -10,7 +9,7 @@ import { AuthRoute } from './components/AuthRoute';
 import { Logout } from './pages/Logout';
 import { Conversation } from './pages/Conversation';
 import { AppLayout } from './components/AppLayout';
-
+import { socket } from './services/socket';
 
 function App() {
 
@@ -45,9 +44,6 @@ function App() {
     useEffect(() => {
 
       if(!currentUser) return;
-      const socket = io("http://localhost:3000", {
-        withCredentials: true,
-      });
 
       socket.on("connect", () => {
         console.log("client connected", socket.id);
