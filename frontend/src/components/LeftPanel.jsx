@@ -1,4 +1,4 @@
-import Chats from "../pages/Chats";
+import { ConversationList } from "./ConversationList";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 import { Contacts } from "../pages/Contacts";
@@ -14,7 +14,7 @@ export function LeftPanel({ conversations }) {
             <Navbar view={view} setView={setView} />
 
             <Sidebar>
-                {view === "contacts" ? <Contacts selectedRow={selectedRow} setSelectedRow={setSelectedRow} /> : <Chats selectedRow={selectedRow} setSelectedRow={setSelectedRow} conversations={conversations} />}
+                {view === "contacts" ? <Contacts selectedRow={selectedRow} setSelectedRow={setSelectedRow} /> :<ConversationList conversations={ conversations }/>}
             </Sidebar>
 
 
