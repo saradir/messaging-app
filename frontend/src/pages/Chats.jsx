@@ -3,6 +3,7 @@ import ConversationList from "../components/ConversationList";
 import { Navbar } from "../components/Navbar";
 
 import "../styles/Chats.css";
+import { fetchConversations } from "../services/conversations";
 
 export default function Chats(){
 
@@ -11,30 +12,18 @@ export default function Chats(){
    const [error, setError] = useState('');
 
    useEffect(() => {
-    async function fetchConversations(){
+    async function loadConversations(){
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations`,{
-                credentials: "include"
-            });
-    
-            if(!response.ok){
-                setError("Failed to retrieve conversations");
-                console.error("Fetch failed: ", response.status)
-                return;
-            }
-
-            const data = await response.json();
-            setConversations(data.data)   
+            const conversations = await fetchConversations();
+            setConversations(conversations);
         } catch (err) {
             setError("Failed to retrieve conversations");
-            console.error("Error: ", err)
-            
+            console.error("Error: ", err)           
         } finally{
             setLoading(false);
         }
     }
-
-    fetchConversations();
+    loadConversations();
    }, []);
 
 
