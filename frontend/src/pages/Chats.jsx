@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import ConversationList from "../components/ConversationList";
-import { Navbar } from "../components/Navbar";
-
 import "../styles/Chats.css";
 import { fetchConversations } from "../services/conversations";
 
