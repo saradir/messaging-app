@@ -1,9 +1,11 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
+import { getIO } from "../config/socket.js"; 
 
 export async function create(req, res, next){
 
     const { conversationId, content } = matchedData(req);
+    const io = getIO();
 
     //Authorize
     try{
@@ -25,9 +27,24 @@ export async function create(req, res, next){
                 authorId: req.user.id,
                 content,
                 conversationId
+            },
+            include: {
+                conversation: {
+                    include: {
+                        memberships: {
+                            include: { user: { select: { id: true, username: true } } }
+                        }
+                    }
+                }
             }
         });
 
+
+
+        message.conversation.memberships.forEach( m => {
+            io.to(`user:${m.user.id}`).emit("conversation:update", message);
+            console.log(`message sent to ${m.user.username}`)
+        })
         return res.status(201).json({
             success: true,
             data: message
