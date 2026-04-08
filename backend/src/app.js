@@ -2,29 +2,21 @@ import express from "express";
 import cors from "cors";
 import 'dotenv/config';
 import { corsOptions } from "./config/cors-options.js";
-import session from "express-session";
 import authRouter  from "./routers/auth.router.js";
 import conversationsRouter from "./routers/conversations.js";
 import contactsRouter from "./routers/contacts.js"
 import { createServer } from "http";
-import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
-import passport from "passport";
-import './config/passport.js';
-import { registerSocketHandlers } from "./config/socket.js";
+import passport from './config/passport.js';
+import { sessionMiddleware } from "./config/session.js";
+import { initSocket, registerSocketHandlers } from "./config/socket.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-
-
-const sessionMiddleware = session({
-  secret: "secret",
-  resave: false,
-  saveUninitialized: false,
-});
 
 app.use(sessionMiddleware);
 app.use(passport.initialize());
@@ -58,21 +50,9 @@ app.use((err, req, res, next) => {
 });
 
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:5173",
-    credentials: true,
-  },
-});
+const io = initSocket(httpServer);
 
-const wrap = (middleware) => (socket, next) =>
-  middleware(socket.request, {}, next);
-
-io.use(wrap(sessionMiddleware));
-io.use(wrap(passport.initialize()));
-io.use(wrap(passport.session()));
 registerSocketHandlers(io);
-
 
 httpServer.listen(PORT);
 export default app;
