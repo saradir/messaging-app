@@ -18,7 +18,10 @@ export const validateCreateMessage = [
         .trim()
         .notEmpty().withMessage("Message cannot be empty")
         .isLength({ min: 1, max: 2000 })
-        .withMessage("Message must be between 1 and 2000 characters")
+        .withMessage("Message must be between 1 and 2000 characters"),
+
+    body("clientId")
+        .exists().withMessage("clientId is required")
 ]
 
 export const validateIndexMessages = [

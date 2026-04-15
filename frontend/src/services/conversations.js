@@ -38,14 +38,18 @@ export async function fetchMessages(conversationId){
 
 }
 
-export async function sendMessage(conversationId, content){
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
+export async function sendMessage(message){
+
+    const {conversationId, content, clientId } =  message ;
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${message.conversationId}/messages`, {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
+                conversationId,
+                clientId,
                 content
             })
         });
@@ -59,6 +63,21 @@ export async function sendMessage(conversationId, content){
         const data = await response.json();
         return data.data;
     }
+
+export async function fetchConversations(){
+
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations`,{
+        credentials: "include"
+    });
+
+    if(!response.ok){
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || `Operation failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.data;
+}
 
 
         

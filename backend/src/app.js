@@ -2,22 +2,23 @@ import express from "express";
 import cors from "cors";
 import 'dotenv/config';
 import { corsOptions } from "./config/cors-options.js";
-import session from "express-session";
 import authRouter  from "./routers/auth.router.js";
 import conversationsRouter from "./routers/conversations.js";
 import contactsRouter from "./routers/contacts.js"
-
+import { createServer } from "http";
 import cookieParser from "cookie-parser";
-import passport from "passport";
-import './config/passport.js';
+import passport from './config/passport.js';
+import { sessionMiddleware } from "./config/session.js";
+import { initSocket, registerSocketHandlers } from "./config/socket.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(session({ secret: "secret", resave: false, saveUninitialized: false}));
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -48,6 +49,10 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Server started on ${PORT}`));
+const httpServer = createServer(app);
+const io = initSocket(httpServer);
 
+registerSocketHandlers(io);
+
+httpServer.listen(PORT);
 export default app;
