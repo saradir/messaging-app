@@ -38,14 +38,18 @@ export async function fetchMessages(conversationId){
 
 }
 
-export async function sendMessage(conversationId, content){
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
+export async function sendMessage(message){
+
+    const {conversationId, content, clientId } =  message ;
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${message.conversationId}/messages`, {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
+                conversationId,
+                clientId,
                 content
             })
         });
