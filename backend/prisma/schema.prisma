@@ -53,6 +53,7 @@ model Conversation {
 
 model Message {
   id             Int          @id @default(autoincrement())
+  clientId       Int
   content        String?
   authorId       Int
   conversationId Int
@@ -62,6 +63,7 @@ model Message {
   conversation   Conversation @relation(fields: [conversationId], references: [id])
 
   @@index([conversationId, createdAt])
+  @@unique([conversationId, clientId])
 }
 
 enum MembershipRole {
