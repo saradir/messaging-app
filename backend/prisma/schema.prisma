@@ -53,7 +53,7 @@ model Conversation {
 
 model Message {
   id             Int          @id @default(autoincrement())
-  clientId       Int
+  clientId       String
   content        String?
   authorId       Int
   conversationId Int
