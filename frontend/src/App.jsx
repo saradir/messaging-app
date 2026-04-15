@@ -10,14 +10,16 @@ import { Logout } from './pages/Logout';
 import { Conversation } from './pages/Conversation';
 import { AppLayout } from './components/AppLayout';
 import { socket } from './services/socket';
+import { useChatStore } from './stores/chatStore';
+import { fetchConversations } from './services/conversations';
 
 function App() {
-
-
+  const setConversations = useChatStore((state) => state.setConversations);
   const [currentUser, setCurrentUser] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
+  // Authenticate user
   useEffect(() => {
 
     async function authUser(){
@@ -34,25 +36,56 @@ function App() {
       } catch (err) {
         console.error("Error contacting /auth/identify: ", err);
         setError("Server unreachable. Please try again later.");          
-      } finally{
-        setLoading(false);
-      }
-    }     
+
+      }     
+    }
   authUser();
   }, []);
 
+    // Connect socket
+    useEffect(() => {
+      
+      if(!currentUser) return;
+      socket.connect();
+
+      function handleConnect() {
+        console.log("client connected", socket.id);
+      }
+
+      socket.on("connect", handleConnect);
+
+    return () => {
+      socket.off("connect");
+      socket.disconnect();
+    };
+  }, [currentUser]);
+
+    // Fetch conversations
     useEffect(() => {
 
       if(!currentUser) return;
+      setLoading(true);
+      async function loadConversations(){
+          try {
+              const conversations = await fetchConversations();
+              setConversations(conversations);
+          } catch (err) {
+              setError("Failed to retrieve conversations");
+              console.error("Error: ", err)           
+          } finally{
+              setLoading(false);
+          }
+      }
+    
+      loadConversations();
+    }, [currentUser, setConversations]);
 
-      socket.on("connect", () => {
-        console.log("client connected", socket.id);
-      });
 
-      return () => {
-        socket.disconnect();
-      };
-  }, [currentUser]);
+
+  socket.on("message:new", (message) => {
+      useChatStore.getState().receiveMessage(message);
+    });
+  
 
 
   if(loading) return <p>Loading</p>;
