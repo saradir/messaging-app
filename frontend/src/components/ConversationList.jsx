@@ -1,10 +1,13 @@
 import { ConversationRow } from "./ConversationRow";
 
 import "../styles/ConversationList.css";
+import { useChatStore } from "../stores/chatStore";
 
 
-export function ConversationList({ conversations }){
 
+export function ConversationList(){
+    const conversations = useChatStore((state) => state.conversations);
+    
     if(!conversations || conversations.length === 0) return <div className="empty-state">No chats yet</div>
   
     return(

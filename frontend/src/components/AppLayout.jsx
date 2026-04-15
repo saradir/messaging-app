@@ -5,7 +5,7 @@ import "../styles/AppLayout.css"
 export function AppLayout() {
   return (
     <div className="app-layout">
-      <LeftPanel conversations={conversations} />
+      <LeftPanel  />
       <div className="main-panel">
         <Outlet />
       </div>

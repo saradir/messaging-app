@@ -4,7 +4,8 @@ import { Sidebar } from "./Sidebar";
 import { Contacts } from "../pages/Contacts";
 import { useState } from "react";
 import "../styles/LeftPanel.css"
-export function LeftPanel({ conversations }) {
+
+export function LeftPanel() {
 
     const [view, setView] = useState("chats");
     const [selectedRow, setSelectedRow] = useState(null);
@@ -14,10 +15,8 @@ export function LeftPanel({ conversations }) {
             <Navbar view={view} setView={setView} />
 
             <Sidebar>
-                {view === "contacts" ? <Contacts selectedRow={selectedRow} setSelectedRow={setSelectedRow} /> :<ConversationList conversations={ conversations }/>}
+                {view === "contacts" ? <Contacts selectedRow={selectedRow} setSelectedRow={setSelectedRow} /> :<ConversationList />}
             </Sidebar>
-
-
         </div>
     );
 }
