@@ -50,4 +50,16 @@ export const useChatStore = create((set, get) => ({
       conversations: sorted,
     });
   },
+
+
+  updateMessageStatus: (conversationId, messageClientId, status) => {
+    const state = get();
+    const existing = state.messagesByConversation[conversationId] || [];
+    const message = existing.find(m => m.clientId === messageClientId);
+    if(!message) return;
+
+    const updated = {...message, status}
+    get().receiveMessage(updated);
+
+  }
 }));
