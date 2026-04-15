@@ -42,7 +42,7 @@ export async function create(req, res, next){
 
 
         message.conversation.memberships.forEach( m => {
-            io.to(`user:${m.user.id}`).emit("conversation:update", message);
+            io.to(`user:${m.user.id}`).emit("message:new", message);
             console.log(`message sent to ${m.user.username}`)
         })
         return res.status(201).json({
