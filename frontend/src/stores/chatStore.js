@@ -27,7 +27,7 @@ export const useChatStore = create((set, get) => ({
     // --- update messages ---
     const existing = state.messagesByConversation[conversationId] || [];
 
-    const updatedMessages = [...existing.filter(m => m.id !== message.id), message];
+    const updatedMessages = [...existing.filter(m => m.clientId !== message.clientId), message]; // Dedupe local message
 
     // --- update conversations list ---
     const updatedConversations = state.conversations.map((c) =>
