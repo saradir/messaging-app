@@ -4,7 +4,7 @@ import { getIO } from "../config/socket.js";
 
 export async function create(req, res, next){
 
-    const { conversationId, content } = matchedData(req);
+    const { conversationId, content, clientId } = matchedData(req);
     const io = getIO();
 
     //Authorize
@@ -26,7 +26,8 @@ export async function create(req, res, next){
             data:{
                 authorId: req.user.id,
                 content,
-                conversationId
+                conversationId,
+                clientId
             },
             include: {
                 conversation: {
