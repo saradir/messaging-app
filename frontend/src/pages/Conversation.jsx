@@ -6,80 +6,54 @@ import { MessagesContainer } from "../components/MessagesContainer.jsx";
 import { AuthContext } from "../context/AuthContext";
 import { socket } from "../services/socket.js";
 import "../styles/Conversation.css";
+import { useChatStore } from "../stores/chatStore.js";
 
 export function Conversation(){
 
     const [loading, setLoading] = useState(true);
-    const [messages, setMessages] = useState([]);
     const [error, setError] = useState(null)
     const { currentUser} = useContext(AuthContext);
 
     const { conversationId } = useParams();
+   const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
+   const setMessages = useChatStore((state) => state.setMessages);
+   const receiveMessage = useChatStore((state => state.receiveMessage));
+   const updateMessageStatus = useChatStore((state => state.updateMessageStatus));
 
     async function handleSubmitMessage(content){
 
-        const tempId = crypto.randomUUID();
-        const tempMessage = {authorId: currentUser.id, content, status: "pending", id: tempId }
-        setMessages(prev => [...prev, tempMessage]); // Update optimistically 
+        const clientId = crypto.randomUUID();
+        const message = {authorId: currentUser.id, conversationId, content, status: "pending", clientId }
+        receiveMessage(message); // Update optimistically 
        
         try{
-            const uploadedMessage = await sendMessage(conversationId, content);
-            setMessages(prev =>
-                prev.map(m =>
-                    m.id === tempId
-                    ? uploadedMessage
-                    : m
-                )
-            ); 
+            await sendMessage(message);
         } catch (error) {
-
             console.error("Failed to send message:", error);
             // update failed status
-            setMessages( prev => 
-                prev.map( m =>
-                    m.id === tempId
-                    ? {...m, status: "failed"}
-                    : m
-                )
-            );
+            updateMessageStatus(conversationId, clientId, "failed");
         }
-
     }
     
     async function handleResendMessage(message){
 
-        setMessages( prev =>
-            prev.map( m => 
-                m.id === message.id
-                    ? { ...m, status: "pending"}
-                    : m
-            )
-        );
+        const { conversationId, clientId, content } = message
+        updateMessageStatus(conversationId, clientId, "pending");
 
         try{
-            const uploadedMessage= await sendMessage(conversationId, message.content);
-            setMessages(prev => [
-                ...prev.filter(m => m.id !== message.id),
-                uploadedMessage
-                ]);
+            await sendMessage(message);
         } catch (error){
                 console.error(error);
-                setMessages( prev =>
-                    prev.map( m => 
-                        m.id === message.id
-                        ? { ...m, status: "failed"}
-                        : m
-                    )
-                );
+                updateMessageStatus(conversationId, clientId, "failed");
             }
     }
 
     useEffect(() => {
-        if (!conversationId) return;
+        if (!conversationId) return; 
         async function loadMessages(){
             try {
                 const messages = await fetchMessages(conversationId);
-                setMessages(messages);
+                setMessages(conversationId, messages);
             } catch (error) {
                 setError("Failed to load messages");
                 console.error(error);                
@@ -91,10 +65,10 @@ export function Conversation(){
         loadMessages();
         socket.emit("conversation:join", conversationId);
         return () => {
-            // later you may emit leave, but not required yet
+            // emit leave later
         };
+    }, [conversationId, setMessages]); 
 
-    }, [conversationId]);
 
     if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
