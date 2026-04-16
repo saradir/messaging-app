@@ -10,7 +10,7 @@ import "../styles/Contacts.css";
 import { useModal } from "../hooks/useModal";
 import { useNavigate } from "react-router-dom";
 
-export function Contacts({selectedRow, setSelectedRow}){
+export function Contacts({setView}){
     const contactProfile = useModal();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ export function Contacts({selectedRow, setSelectedRow}){
     async function handleRowClick(userId){       
         const {id} = await startConversation(userId);
         navigate(`/conversations/${id}`);
-        setSelectedRow({type: "contact", id: userId})        
+        setView("chats");
     }
 
     
@@ -125,7 +125,7 @@ export function Contacts({selectedRow, setSelectedRow}){
 
             {searchMode
             ?<SearchResults contacts={searchResults} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} />
-            :<ContactsList contacts={contacts} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} selectedRow={selectedRow} />
+            :<ContactsList contacts={contacts} viewUserProfile={viewUserProfile} handleRowClick={handleRowClick} />
             }
 
             { contactProfile.isOpen &&
