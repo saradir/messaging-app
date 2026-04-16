@@ -6,6 +6,7 @@ export function MessageComposer({handleSubmit}){
 
     async function submitForm(e){
         e.preventDefault();
+        if(input.trim().length === 0) return;
         try{
             await handleSubmit(input);
             setInput('');
@@ -17,9 +18,8 @@ export function MessageComposer({handleSubmit}){
         <form className="message-input" onSubmit={submitForm}>
             <textarea name="content" minLength={1} value={input} onChange={e => setInput(e.target.value)}>
 
-            </textarea>
 
-            <button type="submit" className="submit-button" disabled={input.length < 1}>Send</button>
+            <button type="submit" className="submit-button" disabled={input.trim().length < 1}>Send</button>
         </form>
     )
 }
