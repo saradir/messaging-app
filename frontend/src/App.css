@@ -28,6 +28,9 @@
 
   --border: #2a3942;
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --header-height: 56px;
+  
+
 }
 
 * {

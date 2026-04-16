@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { fetchMessages, sendMessage } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
 import { MessagesContainer } from "../components/MessagesContainer.jsx";
+import { ConversationHeader } from "../components/ConversationHeader.jsx";
 import { AuthContext } from "../context/AuthContext";
 import { socket } from "../services/socket.js";
 import "../styles/Conversation.css";
@@ -19,6 +20,13 @@ export function Conversation(){
     const setMessages = useChatStore((state) => state.setMessages);
     const receiveMessage = useChatStore((state => state.receiveMessage));
     const updateMessageStatus = useChatStore((state => state.updateMessageStatus));
+    const conversation = useChatStore(
+        state => state.conversations.find(c => c.id === Number(conversationId))
+        );
+    console.log(conversation)
+    const otherUser = conversation?.participants.find(
+        p => p.id !== currentUser.id
+        );
 
     async function handleSubmitMessage(content){
 
@@ -76,6 +84,7 @@ export function Conversation(){
     return(
 
         <div className="conversation-container">
+            <ConversationHeader username={otherUser.username} />
             <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} />
                  
             <MessageComposer handleSubmit={handleSubmitMessage} />
