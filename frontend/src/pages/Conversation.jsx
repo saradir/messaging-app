@@ -15,10 +15,10 @@ export function Conversation(){
     const { currentUser} = useContext(AuthContext);
 
     const { conversationId } = useParams();
-   const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
-   const setMessages = useChatStore((state) => state.setMessages);
-   const receiveMessage = useChatStore((state => state.receiveMessage));
-   const updateMessageStatus = useChatStore((state => state.updateMessageStatus));
+    const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
+    const setMessages = useChatStore((state) => state.setMessages);
+    const receiveMessage = useChatStore((state => state.receiveMessage));
+    const updateMessageStatus = useChatStore((state => state.updateMessageStatus));
 
     async function handleSubmitMessage(content){
 
