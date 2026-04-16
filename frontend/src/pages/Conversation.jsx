@@ -37,7 +37,7 @@ export function Conversation(){
     
     async function handleResendMessage(message){
 
-        const { conversationId, clientId, content } = message
+        const { conversationId, clientId } = message
         updateMessageStatus(conversationId, clientId, "pending");
 
         try{
