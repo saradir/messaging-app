@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { fetchMessages, sendMessage } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
@@ -14,8 +14,11 @@ export function Conversation(){
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null)
     const { currentUser} = useContext(AuthContext);
-
     const { conversationId } = useParams();
+    const bottomRef = useRef(null);
+    const hasLoaded = useRef(false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
     const setMessages = useChatStore((state) => state.setMessages);
     const receiveMessage = useChatStore((state => state.receiveMessage));
@@ -23,7 +26,6 @@ export function Conversation(){
     const conversation = useChatStore(
         state => state.conversations.find(c => c.id === Number(conversationId))
         );
-    console.log(conversation)
     const otherUser = conversation?.participants.find(
         p => p.id !== currentUser.id
         );
@@ -32,8 +34,7 @@ export function Conversation(){
 
         const clientId = crypto.randomUUID();
         const message = {authorId: currentUser.id, conversationId, content, status: "pending", clientId }
-        receiveMessage(message); // Update optimistically 
-       
+        receiveMessage(message); // Update optimistically       
         try{
             await sendMessage(message);
         } catch (error) {
@@ -57,6 +58,10 @@ export function Conversation(){
     }
 
     useEffect(() => {
+        hasLoaded.current = false;
+    }, [conversationId]);
+
+    useEffect(() => {
         if (!conversationId) return; 
         async function loadMessages(){
             try {
@@ -67,6 +72,7 @@ export function Conversation(){
                 console.error(error);                
             } finally{
                 setLoading(false);
+                
             }
         }
 
@@ -77,6 +83,15 @@ export function Conversation(){
         };
     }, [conversationId, setMessages]); 
 
+    useEffect(() => {
+        if(!hasLoaded.current){
+            bottomRef.current?.scrollIntoView({ behavior: "auto" });
+            hasLoaded.current = true;
+        }else{
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
+
 
     if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
@@ -85,7 +100,7 @@ export function Conversation(){
 
         <div className="conversation-container">
             <ConversationHeader username={otherUser.username} />
-            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} />
+            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} />
                  
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
