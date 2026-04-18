@@ -17,6 +17,14 @@ export function Conversation(){
     const { conversationId } = useParams();
     const bottomRef = useRef(null);
     const hasLoaded = useRef(false);
+    const containerRef = useRef(null);
+    const nearBottomRef = useRef(true);
+
+    const isNearBottom = () => {
+        const container = containerRef.current;
+        if(!container) return false;
+        return (container.scrollHeight - container.scrollTop - container.clientHeight < 100);
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
@@ -30,6 +38,10 @@ export function Conversation(){
         p => p.id !== currentUser.id
         );
 
+    function handleScroll(){
+        nearBottomRef.current = isNearBottom();
+     }
+    
     async function handleSubmitMessage(content){
 
         const clientId = crypto.randomUUID();
@@ -57,12 +69,9 @@ export function Conversation(){
             }
     }
 
+    //---Load Messages---//
     useEffect(() => {
-        hasLoaded.current = false;
-    }, [conversationId]);
-
-    useEffect(() => {
-        if (!conversationId) return; 
+        if (!conversationId) return;
         async function loadMessages(){
             try {
                 const messages = await fetchMessages(conversationId);
@@ -81,14 +90,23 @@ export function Conversation(){
         return () => {
             // emit leave later
         };
-    }, [conversationId, setMessages]); 
+    }, [conversationId, setMessages]);
+    
+    
+    useEffect(() => {
+        hasLoaded.current = false;
+    }, [conversationId]);
 
+
+    //---Scroll Behaviour---//
     useEffect(() => {
         if(!hasLoaded.current){
             bottomRef.current?.scrollIntoView({ behavior: "auto" });
             hasLoaded.current = true;
         }else{
-            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            if(nearBottomRef.current){
+                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            }
         }
     }, [messages]);
 
@@ -100,7 +118,7 @@ export function Conversation(){
 
         <div className="conversation-container">
             <ConversationHeader username={otherUser.username} />
-            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} />
+            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} containerRef={containerRef} onScroll={handleScroll} />
                  
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
