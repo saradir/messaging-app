@@ -55,8 +55,8 @@
 
 /* hover */
 .scroll-button:hover {
-  transform: translateX(-50%) translateY(-2px);
   color: rgba(255, 255, 255, 0.6);
+  transform: translateX(-50%) translateY(-2px) scale(1.05);
 }
 
 /* svg sizing */
