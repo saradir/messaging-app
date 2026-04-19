@@ -20,7 +20,7 @@ export async function index(req, res, next){
                             select: {
                                 user: {select: {id: true, username: true}},
                                 role: true,
-                                lastReadAt: true
+                                lastSeenMessageId: true
                             },
                         },                    
                         messages: {
@@ -47,7 +47,7 @@ export async function index(req, res, next){
                 participants: c.memberships
                 .map((mm) => mm.user)
                 .filter((u) => u.id !== req.user.id),
-                myMembership: { role: m.role, lastReadAt: m.lastReadAt },
+                myMembership: { role: m.role, lastSeenMessageId: m.lastSeenMessageId },
             };
         });
                 
