@@ -1,5 +1,15 @@
 import { create } from "zustand";
 
+
+const sortConversations = (conversations) => {
+  conversations.sort((a, b) => {
+      const aTime = a.lastMessage?.createdAt || 0;
+      const bTime = b.lastMessage?.createdAt || 0;
+      return bTime - aTime;
+    });
+  return conversations;
+}
+
 export const useChatStore = create((set, get) => ({
   conversations: [],
   messagesByConversation: {},
@@ -36,11 +46,7 @@ export const useChatStore = create((set, get) => ({
         : c
     );
 
-    const sorted = updatedConversations.sort((a, b) => {
-      const aTime = a.lastMessage?.createdAt || 0;
-      const bTime = b.lastMessage?.createdAt || 0;
-      return bTime - aTime;
-    });
+    const sorted = sortConversations(updatedConversations);
 
     set({
       messagesByConversation: {
