@@ -1,7 +1,7 @@
 import { MessageBalloon } from "./MessageBalloon"
 import "../styles/MessagesContainer.css";
 
-export function MessagesContainer({ messages, handleResendMessage, bottomRef, containerRef, onScroll }) {
+export function MessagesContainer({ messages, handleResendMessage, bottomRef, containerRef, onScroll, observer, lastSeenMessageId }) {
     
     if (!messages || messages.length === 0) {
         return (<div className="messages-container empty">
@@ -11,13 +11,31 @@ export function MessagesContainer({ messages, handleResendMessage, bottomRef, co
                 );
     }
 
-    return (
-        <div className="messages-container" ref={containerRef} onScroll={onScroll} >
-            {messages.map(m => (
-                <MessageBalloon message={m} key={m.id} onResend={handleResendMessage}/>
-            ))}
+return (
+    <div className="messages-container" ref={containerRef} onScroll={onScroll} >
+        {messages.map((m, i) => {
 
-            <div ref={bottomRef} /> 
-        </div>
-    );
+            const isUnread = m.id > lastSeenMessageId;
+            const isFirstUnread = isUnread && (i === 0 || messages[i-1].id <= lastSeenMessageId);
+
+            return(
+                <React.Fragment key={m.id}>
+                    {isFirstUnread && <div className="unseen-divider">Unseen Messages </div>}
+                    <div className="observer-wrapper"
+                        data-id={m.id}
+                        ref={(node) => {
+                            if (node && m.id > lastSeenMessageId) {
+                                observer.observe(node);
+                            }
+                        }}
+                    >
+                        <MessageBalloon message={m} onResend={handleResendMessage}/>
+                    </div>
+                </React.Fragment>
+            );
+        })}
+
+        <div ref={bottomRef} /> 
+    </div>
+);
 }

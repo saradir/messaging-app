@@ -39,6 +39,22 @@ export function Conversation(){
         p => p.id !== currentUser.id
         );
 
+    const lastSeenMessageId = conversation?.myMembership.lastSeenMessageId;
+
+
+    //---Observer---//
+    const observerOptions = {root: containerRef.current, threshold: 1}
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e =>{
+            if(e.isIntersecting){
+                const messageId = e.target.dataset.id;
+                console.log(messageId);
+            }
+        })
+    }, observerOptions)
+
+
+
     function handleScroll(){
         nearBottomRef.current = isNearBottom();
         setShowScrollButton (!nearBottomRef.current);
@@ -120,21 +136,21 @@ export function Conversation(){
 
         <div className="conversation-container">
             <ConversationHeader username={otherUser.username} />
-            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} containerRef={containerRef} onScroll={handleScroll} />
+            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} containerRef={containerRef} onScroll={handleScroll} observer={observer} lastSeenMessageId={lastSeenMessageId} />
             <button
                 className={`scroll-button ${showScrollButton ? "visible" : ""}`}
                 onClick={() => bottomRef.current?.scrollIntoView({ behavior: "smooth" })}
                 >
-<svg viewBox="0 0 24 24">
-    <path
-      d="M12 5v12M6.5 11.5L12 17l5.5-5.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
+                <svg viewBox="0 0 24 24">
+                    <path
+                    d="M12 5v12M6.5 11.5L12 17l5.5-5.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    />
+                </svg>
             </button>
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
