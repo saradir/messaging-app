@@ -19,9 +19,10 @@ return (
             const isFirstUnread = isUnread && (i === 0 || messages[i-1].id <= lastSeenMessageId);
 
             return(
-                <React.Fragment key={m.id}>
+                <>
                     {isFirstUnread && <div className="unseen-divider">Unseen Messages </div>}
                     <div className="observer-wrapper"
+                        key={m.id}
                         data-id={m.id}
                         ref={(node) => {
                             if (node && m.id > lastSeenMessageId) {
@@ -31,7 +32,7 @@ return (
                     >
                         <MessageBalloon message={m} onResend={handleResendMessage}/>
                     </div>
-                </React.Fragment>
+                </>
             );
         })}
 
