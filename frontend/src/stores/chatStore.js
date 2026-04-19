@@ -67,5 +67,21 @@ export const useChatStore = create((set, get) => ({
     const updated = {...message, status}
     get().receiveMessage(updated);
 
+  },
+
+  updateLastSeenMessage: (conversationId, messageId) => {
+    const state = get();
+    const updated = state.conversations.map((c) =>
+      c.id === conversationId
+        ? {
+            ...c,
+            myMembership: {
+              ...c.myMembership,
+              lastSeenMessageId: messageId,
+            },
+          }
+        : c
+    );
+    set({ conversations: updated});
   }
 }));
