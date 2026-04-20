@@ -30,30 +30,31 @@ export function Conversation(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
     const setMessages = useChatStore((state) => state.setMessages);
-    const receiveMessage = useChatStore((state => state.receiveMessage));
-    const updateMessageStatus = useChatStore((state => state.updateMessageStatus));
+    const receiveMessage = useChatStore((state) => state.receiveMessage);
+    const updateMessageStatus = useChatStore((state) => state.updateMessageStatus);
+    const updateLastSeenMessage = useChatStore((state) => state.updateLastSeenMessage)
     const conversation = useChatStore(
         state => state.conversations.find(c => c.id === conversationId)
         );
     const otherUser = conversation?.participants.find(
         p => p.id !== currentUser.id
         );
+    const committedLastSeenMessageId = conversation?.myMembership.lastSeenMessageId ?? 0;
+    const pendingSeenRef = useRef(committedLastSeenMessageId);
+    const timeoutIdRef = useRef(null);
 
-    const lastSeenMessageId = conversation?.myMembership.lastSeenMessageId;
-
-
-    //---Observer---//
-    const observerOptions = {root: containerRef.current, threshold: 1}
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e =>{
-            if(e.isIntersecting){
-                const messageId = e.target.dataset.id;
-                console.log(messageId);
-            }
-        })
-    }, observerOptions)
-
-
+  
+    // Handle when unseen message comes into view
+    function handleMessageSeen(messageId){
+        pendingSeenRef.current = messageId;
+        console.log("last seen after handle:", pendingSeenRef)
+        // throttled updates to store
+        if(timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = setTimeout(() => {
+            updateLastSeenMessage(conversationId, messageId)
+            console.log("commited: ", messageId)
+        }, 1000);
+    }
 
     function handleScroll(){
         nearBottomRef.current = isNearBottom();
@@ -136,7 +137,7 @@ export function Conversation(){
 
         <div className="conversation-container">
             <ConversationHeader username={otherUser.username} />
-            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} containerRef={containerRef} onScroll={handleScroll} observer={observer} lastSeenMessageId={lastSeenMessageId} />
+            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} containerRef={containerRef} onScroll={handleScroll} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} />
             <button
                 className={`scroll-button ${showScrollButton ? "visible" : ""}`}
                 onClick={() => bottomRef.current?.scrollIntoView({ behavior: "smooth" })}
