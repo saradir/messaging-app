@@ -15,7 +15,7 @@ export function Conversation(){
     const [error, setError] = useState(null)
     const [showScrollButton, setShowScrollButton] = useState(false);
     const { currentUser} = useContext(AuthContext);
-    const { conversationId } = useParams();
+    const conversationId = Number(useParams().conversationId);
     const bottomRef = useRef(null);
     const hasLoaded = useRef(false);
     const containerRef = useRef(null);
@@ -33,7 +33,7 @@ export function Conversation(){
     const receiveMessage = useChatStore((state => state.receiveMessage));
     const updateMessageStatus = useChatStore((state => state.updateMessageStatus));
     const conversation = useChatStore(
-        state => state.conversations.find(c => c.id === Number(conversationId))
+        state => state.conversations.find(c => c.id === conversationId)
         );
     const otherUser = conversation?.participants.find(
         p => p.id !== currentUser.id
