@@ -17,3 +17,26 @@
   align-items: center;
   color: var(--text-muted);
 }
+
+.unseen-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 1rem 0;
+  position: relative;
+
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.unseen-divider::before,
+.unseen-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin: 0 0.75rem;
+}
