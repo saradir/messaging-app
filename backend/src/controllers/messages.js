@@ -81,13 +81,13 @@ const { conversationId } = matchedData(req);
                 conversationId
             },
 
-            orderBy: { createdAt: "asc" },
+            orderBy: { createdAt: "desc" },
             take: limit
          })
 
          return res.status(200).json({
             success: true,
-            data: messages
+            data: messages.reverse()
          });
     } catch(err){
         next(err);
