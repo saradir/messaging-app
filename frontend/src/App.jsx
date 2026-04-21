@@ -52,12 +52,18 @@ function App() {
         console.log("client connected", socket.id);
       }
 
-      socket.on("connect", handleConnect);
+      function handleNewMessage(message){
+        useChatStore.getState().receiveMessage(message);
+      }
 
-    return () => {
-      socket.off("connect");
-      socket.disconnect();
-    };
+      socket.on("connect", handleConnect);
+      socket.on("message:new", handleNewMessage);
+    
+      return () => {
+        socket.off("message:new");
+        socket.off("connect");
+        socket.disconnect();
+      };
   }, [currentUser]);
 
     // Fetch conversations
@@ -82,9 +88,6 @@ function App() {
 
 
 
-  socket.on("message:new", (message) => {
-      useChatStore.getState().receiveMessage(message);
-    });
   
 
 
