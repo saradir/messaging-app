@@ -38,9 +38,9 @@ function App() {
 
       }finally{
         setAuthLoading(false);
-      }     
+      }   
     }
-  authUser();
+    authUser();
   }, []);
 
     // Connect socket
@@ -78,7 +78,7 @@ function App() {
           } catch (err) {
               if (!cancelled) setError("Failed to retrieve conversations");
               console.error("Error: ", err)           
-          }
+          } 
       }
     
       loadConversations();
@@ -87,7 +87,7 @@ function App() {
       }
     }, [currentUser, setConversations, authLoading]);
 
-  
+
   if(authLoading) return <p>Authenticating...</p>
   if(error) return <p>{error}</p>;
   return (
