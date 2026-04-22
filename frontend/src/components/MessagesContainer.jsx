@@ -1,13 +1,19 @@
 import { MessageBalloon } from "./MessageBalloon"
-import {  Fragment, useEffect, useRef } from "react";
+import {  Fragment, useEffect, useRef, useState } from "react";
 import "../styles/MessagesContainer.css";
 
-export function MessagesContainer({ messages, handleResendMessage, bottomRef, onScroll, lastSeenMessageId, handleMessageSeen, containerRef }) {
-
+export function MessagesContainer({ messages, handleResendMessage, lastSeenMessageId, handleMessageSeen }) {
+    const nearBottomRef = useRef(true);
+    const hasLoaded = useRef(false);
+    const containerRef = useRef(null);
+    const bottomRef = useRef(null);
     const observerRef = useRef(null);
     const unseenNodesRef = useRef(new Map());
-    console.log("last seen: ", lastSeenMessageId);
-
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    
+    const dividerIndexRef = useRef(
+        messages.findIndex(m => m.id > lastSeenMessageId)
+    );
     const setMessageNode = (messageId, node) =>{
         if(node){
             unseenNodesRef.current.set(messageId, node);
@@ -15,7 +21,36 @@ export function MessagesContainer({ messages, handleResendMessage, bottomRef, on
             unseenNodesRef.current.delete(messageId);
         }
     }
-    
+
+    const isNearBottom = () => {
+        const container = containerRef.current;
+        if(!container) return false;
+        return (container.scrollHeight - container.scrollTop - container.clientHeight < 100);
+    }
+
+    function handleScroll(){
+        nearBottomRef.current = isNearBottom();
+        setShowScrollButton (!nearBottomRef.current);
+     }
+
+    useEffect(() => {
+        hasLoaded.current = false;
+    }, []);
+
+
+    //---Scroll Behaviour---//
+    useEffect(() => {
+        if(!hasLoaded.current){
+            bottomRef.current?.scrollIntoView({ behavior: "auto" });
+            hasLoaded.current = true;
+        }else{
+            if(nearBottomRef.current){
+                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    }, [messages]);
+
+    //---Observer Setup---//    
     useEffect(() => {
 
         if(!containerRef.current) return;
@@ -26,9 +61,7 @@ export function MessagesContainer({ messages, handleResendMessage, bottomRef, on
                 if(e.isIntersecting){
                     const messageId = Number(e.target.dataset.id);
                     observerRef.current.unobserve(e.target);
-                    console.log(messageId);
                     if(messageId > lastSeenMessageId){ 
-                        console.log(messageId)
                         handleMessageSeen(messageId);
                     }
                 }
@@ -64,15 +97,12 @@ export function MessagesContainer({ messages, handleResendMessage, bottomRef, on
     }
 
     return (
-        <div className="messages-container" ref={containerRef} onScroll={onScroll} >
+        <div className="messages-container" ref={containerRef} onScroll={handleScroll} >
             {messages.map((m, i) => {
-
-                const isUnread = m.id > lastSeenMessageId;
-                const isFirstUnread = isUnread && (i === 0 || messages[i-1].id <= lastSeenMessageId);
 
                 return(
                     <Fragment key={m.id}>
-                        {isFirstUnread && <div className="unseen-divider">Unseen Messages </div>}
+                        {i===dividerIndexRef && <div className="unseen-divider">Unseen Messages </div>}
                         <div className="observer-wrapper"
                             data-id={m.id}
                             ref={(node) => setMessageNode(m.id, node)}
@@ -83,6 +113,21 @@ export function MessagesContainer({ messages, handleResendMessage, bottomRef, on
                 );
             })}
 
+            <button
+                className={`scroll-button ${showScrollButton ? "visible" : ""}`}
+                onClick={() => bottomRef.current?.scrollIntoView({ behavior: "smooth" })}
+                >
+                <svg viewBox="0 0 24 24">
+                    <path
+                    d="M12 5v12M6.5 11.5L12 17l5.5-5.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    />
+                </svg>
+            </button>
             <div ref={bottomRef} /> 
         </div>
     );

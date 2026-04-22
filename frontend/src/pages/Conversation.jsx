@@ -13,21 +13,9 @@ export function Conversation(){
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null)
-    const [showScrollButton, setShowScrollButton] = useState(false);
     const { currentUser} = useContext(AuthContext);
     const conversationId = Number(useParams().conversationId);
-    const bottomRef = useRef(null);
-    const hasLoaded = useRef(false);
-    const containerRef = useRef(null);
-    const nearBottomRef = useRef(true);
 
-    const isNearBottom = () => {
-        const container = containerRef.current;
-        if(!container) return false;
-        return (container.scrollHeight - container.scrollTop - container.clientHeight < 100);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
     const setMessages = useChatStore((state) => state.setMessages);
     const receiveMessage = useChatStore((state) => state.receiveMessage);
@@ -55,11 +43,6 @@ export function Conversation(){
             console.log("commited: ", messageId)
         }, 1000);
     }
-
-    function handleScroll(){
-        nearBottomRef.current = isNearBottom();
-        setShowScrollButton (!nearBottomRef.current);
-     }
     
     async function handleSubmitMessage(content){
 
@@ -112,24 +95,6 @@ export function Conversation(){
     }, [conversationId, setMessages]);
     
     
-    useEffect(() => {
-        hasLoaded.current = false;
-    }, [conversationId]);
-
-
-    //---Scroll Behaviour---//
-    useEffect(() => {
-        if(!hasLoaded.current){
-            bottomRef.current?.scrollIntoView({ behavior: "auto" });
-            hasLoaded.current = true;
-        }else{
-            if(nearBottomRef.current){
-                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-            }
-        }
-    }, [messages]);
-
-
     if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
 
@@ -137,22 +102,7 @@ export function Conversation(){
 
         <div className="conversation-container">
             <ConversationHeader username={otherUser.username} />
-            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} containerRef={containerRef} onScroll={handleScroll} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} />
-            <button
-                className={`scroll-button ${showScrollButton ? "visible" : ""}`}
-                onClick={() => bottomRef.current?.scrollIntoView({ behavior: "smooth" })}
-                >
-                <svg viewBox="0 0 24 24">
-                    <path
-                    d="M12 5v12M6.5 11.5L12 17l5.5-5.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    />
-                </svg>
-            </button>
+            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} />
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )
