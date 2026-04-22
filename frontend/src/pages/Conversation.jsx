@@ -27,7 +27,7 @@ export function Conversation(){
     const otherUser = conversation?.participants.find(
         p => p.id !== currentUser.id
         );
-    const committedLastSeenMessageId = conversation?.myMembership.lastSeenMessageId ?? 0;
+    const committedLastSeenMessageId = conversation?.myMembership.lastSeenMessageId;
     const pendingSeenRef = useRef(committedLastSeenMessageId);
     const timeoutIdRef = useRef(null);
 
@@ -97,7 +97,7 @@ export function Conversation(){
     
     if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
-
+    if (!conversation) return <p>Loading conversation...</p>;
     return(
 
         <div className="conversation-container">
