@@ -10,7 +10,7 @@ const conversationsRouter = Router();
 conversationsRouter.use("/", requireAuth);
 conversationsRouter.post("/", validateStartConversation, handleValidationErrors, conversationController.startConversation);
 conversationsRouter.get("/", conversationController.index)
-conversationsRouter.patch("/conversationId/last-seen", validateUpdateLastSeenMessage, handleValidationErrors, conversationController.updateLastSeenMessage);
+conversationsRouter.patch("/:conversationId/last-seen", validateUpdateLastSeenMessage, handleValidationErrors, conversationController.updateLastSeenMessage);
 conversationsRouter.use("/:conversationId/messages", messagesRouter)
 
 export default conversationsRouter;
