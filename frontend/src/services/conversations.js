@@ -81,7 +81,7 @@ export async function fetchConversations(){
 
 export async function updateLastSeenMessage(conversationId, messageId){
     const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/last-seen`,{
-        method: "patch",
+        method: "PATCH",
         credentials: "include",
         body: JSON.stringify({
             messageId
