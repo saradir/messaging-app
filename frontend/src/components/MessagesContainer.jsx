@@ -3,7 +3,7 @@ import {  Fragment, useEffect, useRef, useState } from "react";
 import "../styles/MessagesContainer.css";
 
 export function MessagesContainer({ messages, handleResendMessage, lastSeenMessageId, handleMessageSeen }) {
-    const nearBottomRef = useRef(true);
+    const nearBottomRef = useRef(true);  // used in ref to track whether user was in ref BEFORE message arrives
     const hasLoaded = useRef(false);
     const containerRef = useRef(null);
     const bottomRef = useRef(null);
@@ -14,13 +14,26 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     const dividerIndexRef = useRef(
         messages.findIndex(m => m.id > lastSeenMessageId)
     );
-    const setMessageNode = (messageId, node) =>{
-        if(node){
-            unseenNodesRef.current.set(messageId, node);
+
+    // Used for effects on first load only(e.g: new messages divider, instant scroll...)
+    useEffect(() => {
+        hasLoaded.current = false;
+    }, []);
+
+
+    //---Scroll Behaviour---//
+    useEffect(() => {
+        // Instant scroll to bottom on first load
+        if(!hasLoaded.current){
+            bottomRef.current?.scrollIntoView({ behavior: "auto" });
+            hasLoaded.current = true;
+        // Smooth scroll on new message if user is already near bottom
         }else{
-            unseenNodesRef.current.delete(messageId);
+            if(nearBottomRef.current){
+                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            }
         }
-    }
+    }, [messages]);
 
     const isNearBottom = () => {
         const container = containerRef.current;
@@ -32,23 +45,6 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
         nearBottomRef.current = isNearBottom();
         setShowScrollButton (!nearBottomRef.current);
      }
-
-    useEffect(() => {
-        hasLoaded.current = false;
-    }, []);
-
-
-    //---Scroll Behaviour---//
-    useEffect(() => {
-        if(!hasLoaded.current){
-            bottomRef.current?.scrollIntoView({ behavior: "auto" });
-            hasLoaded.current = true;
-        }else{
-            if(nearBottomRef.current){
-                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-            }
-        }
-    }, [messages]);
 
     //---Observer Setup---//    
     useEffect(() => {
@@ -85,6 +81,14 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
             }
         });
     }, [messages, lastSeenMessageId]);
+
+    const setMessageNode = (messageId, node) =>{
+        if(node){
+            unseenNodesRef.current.set(messageId, node);
+        }else{
+            unseenNodesRef.current.delete(messageId);
+        }
+    }
 
 
     if (!messages || messages.length === 0) {
