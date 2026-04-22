@@ -118,6 +118,57 @@ export async function startConversation(req, res, next){
     }
 }
 
+async function updateLastSeenMessage(req, res, next){
+
+    try {
+            const { messageId, conversationId } = matchedData(req);
+            const membership = await prisma.membership.findUnique({
+                where: {userId_conversationId: 
+                            {userId: req.user.id, conversationId}
+                        }
+            });
+        
+            if(!membership){
+                return res.status(404).json({
+                    success: false,
+                    message: "Membership not found"
+                });
+            }
+
+            const message = await prisma.message.findFirst({
+                where: {conversationId, id: messageId}
+            });
+
+            if(!message){
+                return res.status(404).json({
+                    success: false,
+                    message: "Invalid message ID"
+                });
+            }
+
+            let lastSeen = membership.lastSeenMessageId;
+            if(membership.lastSeenMessageId  === null || messageId > membership.lastSeenMessageId){
+                const updatedMembership = await prisma.membership.update({
+                    where: {userId_conversationId: 
+                            {userId: req.user.id, conversationId}
+                        },
+                    data: {lastSeenMessageId: messageId},
+                    select: {lastSeenMessageId: true}
+                });
+                
+                lastSeen = updatedMembership.lastSeenMessageId;
+            }
+        
+            return res.status(200).json({
+                success: true,
+                data: { lastSeenMessageId: lastSeen }
+            })
+        
+    } catch (err) {
+        next(err);    
+    }
+}
+
 function participantKey(ids){
     const normalized = [...new Set(ids.map(Number))]
         .sort((a, b) => a -b);

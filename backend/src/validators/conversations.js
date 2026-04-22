@@ -30,3 +30,15 @@ export const validateIndexMessages = [
         .isInt().withMessage("conversationId must be a number")
         .toInt(),
 ]
+
+export const validateUpdateLastSeenMessage = [
+    param("conversationId")
+        .exists().withMessage("conversationId is required")
+        .isInt().withMessage("conversationId must be a number")
+        .toInt(),
+
+    body("messageId")
+        .exists().withMessage("messageId is required")
+        .isInt().withMessage("messageId must be a number")
+        .toInt(),
+]
