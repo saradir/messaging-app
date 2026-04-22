@@ -118,7 +118,7 @@ export async function startConversation(req, res, next){
     }
 }
 
-async function updateLastSeenMessage(req, res, next){
+export async function updateLastSeenMessage(req, res, next){
 
     try {
             const { messageId, conversationId } = matchedData(req);
