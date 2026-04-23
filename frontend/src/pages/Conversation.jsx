@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMessages, sendMessage } from "../services/conversations.js"
+import { fetchMessages, sendMessage, updateLastSeenMessage } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
 import { MessagesContainer } from "../components/MessagesContainer.jsx";
 import { ConversationHeader } from "../components/ConversationHeader.jsx";
@@ -20,7 +20,7 @@ export function Conversation(){
     const setMessages = useChatStore((state) => state.setMessages);
     const receiveMessage = useChatStore((state) => state.receiveMessage);
     const updateMessageStatus = useChatStore((state) => state.updateMessageStatus);
-    const updateLastSeenMessage = useChatStore((state) => state.updateLastSeenMessage)
+    const updateLastSeenMessageToStore = useChatStore((state) => state.updateLastSeenMessage)
     const conversation = useChatStore(
         state => state.conversations.find(c => c.id === conversationId)
         );
@@ -31,16 +31,19 @@ export function Conversation(){
     const pendingSeenRef = useRef(committedLastSeenMessageId);
     const timeoutIdRef = useRef(null);
 
-  
     // Handle when unseen message comes into view
     function handleMessageSeen(messageId){
         pendingSeenRef.current = messageId;
-        console.log("last seen after handle:", pendingSeenRef)
         // throttled updates to store
         if(timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = setTimeout(() => {
-            updateLastSeenMessage(conversationId, messageId)
-            console.log("commited: ", messageId)
+        timeoutIdRef.current = setTimeout(async () => {
+            const latestMessageId = pendingSeenRef.current;
+            try{
+                await updateLastSeenMessage(conversationId, latestMessageId);
+                updateLastSeenMessageToStore(conversationId, latestMessageId);
+            } catch (error) {
+                console.error("Failed to update seen message in server", error);
+            }
         }, 1000);
     }
     
