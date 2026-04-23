@@ -1,5 +1,5 @@
 import { MessageBalloon } from "./MessageBalloon"
-import {  Fragment, useEffect, useRef, useState } from "react";
+import {  Fragment, useEffect, useRef, useState, useCallback } from "react";
 import "../styles/MessagesContainer.css";
 
 export function MessagesContainer({ messages, handleResendMessage, lastSeenMessageId, handleMessageSeen }) {
@@ -26,21 +26,28 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     });
 
     //---Scroll Behaviour---//
-    useEffect(() => {
-        if (dividerIndex === null) return; // Assert divider index first
-        // Instant scroll to bottom/divider on first load
-        if(!hasLoaded.current){
-            if(dividerRef.current){
-                dividerRef.current.scrollIntoView({ behavior: "auto" });
-            }else{
-                bottomRef.current?.scrollIntoView({ behavior: "auto" });
-            }
+
+
+    const setDividerRef = useCallback((node) => {
+        if (node && !hasLoaded.current) {
+            // Instant jump to divider on mount
+            node.scrollIntoView({ behavior: "auto" });
             hasLoaded.current = true;
-        // Smooth scroll on new message if user is already near bottom
-        }else{
-            if(nearBottomRef.current){
-                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-            }
+            dividerRef.current = node; 
+        }
+    }, []);
+
+    useEffect(() => {
+        // SCENARIO A: Initial load, but NO divider exists
+        if (!hasLoaded.current && dividerIndex === -1) {
+            bottomRef.current?.scrollIntoView({ behavior: "auto" });
+            hasLoaded.current = true;
+            return;
+        }
+
+        // SCENARIO B: User is already viewing the chat and a new message arrives
+        if (hasLoaded.current && nearBottomRef.current) {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages, dividerIndex]);
 
@@ -115,7 +122,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
 
                 return(
                     <Fragment key={m.id}>
-                        {i===dividerIndex && <div ref={dividerRef} className="unseen-divider">Unseen Messages </div>}
+                        {i===dividerIndex && <div ref={setDividerRef} className="unseen-divider">Unseen Messages </div>}
                         <div className="observer-wrapper"
                             data-id={m.id}
                             ref={(node) => setMessageNode(m.id, node)}
