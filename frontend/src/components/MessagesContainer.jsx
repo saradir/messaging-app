@@ -11,8 +11,6 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     const observerRef = useRef(null);
     const unseenNodesRef = useRef(new Map());
     const [showScrollButton, setShowScrollButton] = useState(false);
-    const [dividerIndex, setDividerIndex] = useState(null);
-
     // Used for effects on first load only(e.g: new messages divider, instant scroll...)
     useEffect(() => {
         hasLoaded.current = false;
@@ -20,17 +18,12 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
 
 
     //---Set up divider---//
-    useEffect(() => {
-        if (dividerIndex !== null) return; // Ensure index is only calculated once, to avoid movement
-        if (!messages.length) return;
+    const [dividerIndex] = useState(() => {
+        if (!messages.length || lastSeenMessageId == null) return null;
 
-        const index = messages.findIndex(
-            m => lastSeenMessageId == null || m.id > lastSeenMessageId
-        );
-
-        setDividerIndex(index);
-        }, [messages, lastSeenMessageId, dividerIndex]);
-
+        const index = messages.findIndex(m => m.id > lastSeenMessageId);
+        return index;
+    });
 
     //---Scroll Behaviour---//
     useEffect(() => {
