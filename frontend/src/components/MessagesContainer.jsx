@@ -7,13 +7,11 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     const hasLoaded = useRef(false);
     const containerRef = useRef(null);
     const bottomRef = useRef(null);
+    const dividerRef = useRef(null);
     const observerRef = useRef(null);
     const unseenNodesRef = useRef(new Map());
     const [showScrollButton, setShowScrollButton] = useState(false);
-    
-    const dividerIndexRef = useRef(
-        messages.findIndex(m => m.id > lastSeenMessageId)
-    );
+    const [dividerIndex, setDividerIndex] = useState(null);
 
     // Used for effects on first load only(e.g: new messages divider, instant scroll...)
     useEffect(() => {
@@ -21,11 +19,29 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     }, []);
 
 
+    //---Set up divider---//
+    useEffect(() => {
+        if (dividerIndex !== null) return; // Ensure index is only calculated once, to avoid movement
+        if (!messages.length) return;
+
+        const index = messages.findIndex(
+            m => lastSeenMessageId == null || m.id > lastSeenMessageId
+        );
+
+        setDividerIndex(index);
+        }, [messages, lastSeenMessageId, dividerIndex]);
+
+
     //---Scroll Behaviour---//
     useEffect(() => {
-        // Instant scroll to bottom on first load
+        if (dividerIndex === null) return; // Assert divider index first
+        // Instant scroll to bottom/divider on first load
         if(!hasLoaded.current){
-            bottomRef.current?.scrollIntoView({ behavior: "auto" });
+            if(dividerRef.current){
+                dividerRef.current.scrollIntoView({ behavior: "auto" });
+            }else{
+                bottomRef.current?.scrollIntoView({ behavior: "auto" });
+            }
             hasLoaded.current = true;
         // Smooth scroll on new message if user is already near bottom
         }else{
@@ -33,7 +49,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
                 bottomRef.current?.scrollIntoView({ behavior: "smooth" });
             }
         }
-    }, [messages]);
+    }, [messages, dividerIndex]);
 
     const isNearBottom = () => {
         const container = containerRef.current;
@@ -106,7 +122,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
 
                 return(
                     <Fragment key={m.id}>
-                        {i===dividerIndexRef && <div className="unseen-divider">Unseen Messages </div>}
+                        {i===dividerIndex && <div ref={dividerRef} className="unseen-divider">Unseen Messages </div>}
                         <div className="observer-wrapper"
                             data-id={m.id}
                             ref={(node) => setMessageNode(m.id, node)}
