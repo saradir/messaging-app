@@ -105,7 +105,7 @@ export function Conversation(){
 
         <div className="conversation-container">
             <ConversationHeader username={otherUser?.username} />
-            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} />
+            <MessagesContainer key={conversationId} messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} />
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )
