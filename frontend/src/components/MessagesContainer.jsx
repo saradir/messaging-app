@@ -9,13 +9,15 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     const bottomRef = useRef(null);
     const dividerRef = useRef(null);
     const observerRef = useRef(null);
+    const lastSeenRef = useRef(lastSeenMessageId);
+    const handleSeenRef = useRef(handleMessageSeen);
     const unseenNodesRef = useRef(new Map());
     const [showScrollButton, setShowScrollButton] = useState(false);
+
     // Used for effects on first load only(e.g: new messages divider, instant scroll...)
     useEffect(() => {
         hasLoaded.current = false;
     }, []);
-
 
     //---Set up divider---//
     const [dividerIndex] = useState(() => {
@@ -26,8 +28,6 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     });
 
     //---Scroll Behaviour---//
-
-
     const setDividerRef = useCallback((node) => {
         if (node && !hasLoaded.current) {
             // Instant jump to divider on mount
@@ -62,9 +62,15 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
         setShowScrollButton (!nearBottomRef.current);
      }
 
-    //---Observer Setup---//    
+    //---Observer Setup---//
+    
+    // These are kept in refs so that observer is set up once and not reconstructed  on new messages due to dependencies.
     useEffect(() => {
+        lastSeenRef.current = lastSeenMessageId;
+        handleSeenRef.current = handleMessageSeen;
+    });
 
+    useEffect(() => {
         if(!containerRef.current) return;
         
         const observerOptions = {root: containerRef.current, threshold: 1}
@@ -73,8 +79,8 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
                 if(e.isIntersecting){
                     const messageId = Number(e.target.dataset.id);
                     observerRef.current.unobserve(e.target);
-                    if(messageId > lastSeenMessageId){ 
-                        handleMessageSeen(messageId);
+                    if(messageId > lastSeenRef.current){ 
+                        handleSeenRef(messageId);
                     }
                 }
             });
@@ -83,7 +89,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
         return(() => {
             observerRef.current.disconnect();
         });
-    }, [lastSeenMessageId, handleMessageSeen, containerRef]);
+    }, [containerRef]);
 
 
     useEffect(() => {
