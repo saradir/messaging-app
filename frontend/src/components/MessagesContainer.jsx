@@ -1,6 +1,7 @@
 import { MessageBalloon } from "./MessageBalloon"
 import {  Fragment, useEffect, useRef, useState, useCallback } from "react";
 import "../styles/MessagesContainer.css";
+import { MessageObserver } from "./MessageObserver";
 
 export function MessagesContainer({ messages, handleResendMessage, lastSeenMessageId, handleMessageSeen }) {
     const nearBottomRef = useRef(true);  // used in ref to track whether user was in ref BEFORE message arrives
@@ -8,10 +9,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     const containerRef = useRef(null);
     const bottomRef = useRef(null);
     const dividerRef = useRef(null);
-    const observerRef = useRef(null);
     const lastSeenRef = useRef(lastSeenMessageId);
-    const handleSeenRef = useRef(handleMessageSeen);
-    const unseenNodesRef = useRef(new Map());
     const [showScrollButton, setShowScrollButton] = useState(false);
 
     // Used for effects on first load only(e.g: new messages divider, instant scroll...)
@@ -62,55 +60,6 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
         setShowScrollButton (!nearBottomRef.current);
      }
 
-    //---Observer Setup---//
-    
-    // These are kept in refs so that observer is set up once and not reconstructed  on new messages due to dependencies.
-    useEffect(() => {
-        lastSeenRef.current = lastSeenMessageId;
-        handleSeenRef.current = handleMessageSeen;
-    });
-
-    useEffect(() => {
-        if(!containerRef.current) return;
-        
-        const observerOptions = {root: containerRef.current, threshold: 1}
-        observerRef.current = new IntersectionObserver((entries) => {
-            entries.forEach(e =>{
-                if(e.isIntersecting){
-                    const messageId = Number(e.target.dataset.id);
-                    observerRef.current.unobserve(e.target);
-                    if(messageId > lastSeenRef.current){ 
-                        handleSeenRef(messageId);
-                    }
-                }
-            });
-        }, observerOptions);
-
-        return(() => {
-            observerRef.current.disconnect();
-        });
-    }, [containerRef]);
-
-
-    useEffect(() => {
-        if (!observerRef.current) return;
-
-        unseenNodesRef.current.forEach((node, messageId) => {
-            if (messageId > lastSeenMessageId) {
-            observerRef.current.observe(node);
-            } else {
-            observerRef.current.unobserve(node);
-            }
-        });
-    }, [messages, lastSeenMessageId]);
-
-    const setMessageNode = (messageId, node) =>{
-        if(node){
-            unseenNodesRef.current.set(messageId, node);
-        }else{
-            unseenNodesRef.current.delete(messageId);
-        }
-    }
 
 
     if (!messages || messages.length === 0) {
@@ -129,12 +78,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
                 return(
                     <Fragment key={m.id}>
                         {i===dividerIndex && <div ref={setDividerRef} className="unseen-divider">Unseen Messages </div>}
-                        <div className="observer-wrapper"
-                            data-id={m.id}
-                            ref={(node) => setMessageNode(m.id, node)}
-                        >
-                            <MessageBalloon message={m} onResend={handleResendMessage}/>
-                        </div>
+                        <MessageObserver lastSeenMessageId={lastSeenRef} onResend={handleResendMessage} message={m} handleMessageSeen={handleMessageSeen} />                       
                     </Fragment>
                 );
             })}
