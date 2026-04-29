@@ -41,13 +41,18 @@ export async function index(req, res, next){
             const c = m.conversation;
             return{
                 id: c.id,
-                participantHash: c.participantHash,
                 updatedAt: c.updatedAt,
                 lastMessage: c.messages[0] ?? null,
-                participants: c.memberships
-                .map((mm) => mm.user)
-                .filter((u) => u.id !== req.user.id),
-                myMembership: { role: m.role, lastSeenMessageId: m.lastSeenMessageId },
+                partners: c.memberships
+                        .filter(mm => mm.user.id !== req.user.id)
+                        .map(mm => mm.user),
+                memberships: c.memberships
+                .map((mm) => ({
+                    id: mm.user.id,
+                    username: mm.user.username,
+                    role: mm.role,
+                    lastSeenMessageId: mm.lastSeenMessageId, 
+                    })),                
             };
         });
                 
