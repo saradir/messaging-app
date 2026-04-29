@@ -13,14 +13,19 @@ const sortConversations = (conversations) => {
 export const useChatStore = create((set, get) => ({
   conversations: [],
   messagesByConversation: {},
+  membershipsByConversation: {},
+  currentUserId: 0,
 
-  setConversations: (updater) =>
-    set((state) => ({
-      conversations:
-        typeof updater === "function"
-          ? updater(state.conversations)
-          : updater,
-    })),
+  setConversations: (conversations) => {
+    const membershipMap = {};
+    conversations.forEach(c => {
+      membershipMap[c.id] = {};
+      c.memberships.forEach(m => {
+        membershipMap[c.id][m.id] = m;
+      })
+    })
+    set({conversations: conversations, membershipsByConversation: membershipMap});
+  },
 
   setMessages: (conversationId, messages) =>
     set((state) => ({
@@ -69,19 +74,17 @@ export const useChatStore = create((set, get) => ({
 
   },
 
-  updateLastSeenMessage: (conversationId, messageId) => {
-    const state = get();
-    const updated = state.conversations.map((c) =>
-      c.id === conversationId
-        ? {
-            ...c,
-            myMembership: {
-              ...c.myMembership,
-              lastSeenMessageId: messageId,
-            },
+    updateLastSeenMessage: (conversationId, userId, messageId) => 
+      set((state) => ({
+        membershipsByConversation: {
+          ...state.membershipsByConversation,
+          [conversationId]: {
+            ...state.membershipsByConversation[conversationId],
+            [userId]: {
+              ...state.membershipsByConversation[conversationId]?.[userId],
+              lastSeenMessageId: messageId
+            }
           }
-        : c
-    );
-    set({ conversations: updated});
-  }
-}));
+        }
+      })),
+  }));
