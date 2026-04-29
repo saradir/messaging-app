@@ -28,7 +28,7 @@ export function Conversation(){
     const partnerMembership = conversation?.memberships.find(
         m => m.id !== currentUser.id
         );
-    const committedLastSeenMessageId = memberships[currentUser.id].lastSeenMessageId;
+    const committedLastSeenMessageId = memberships?.[currentUser.id]?.lastSeenMessageId;
     const pendingSeenRef = useRef(committedLastSeenMessageId);
     const timeoutIdRef = useRef(null);
 
