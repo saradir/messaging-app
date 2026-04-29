@@ -57,12 +57,18 @@ function App() {
         useChatStore.getState().receiveMessage(message);
       }
 
+      function handleMessageSeen(membership){
+        useChatStore.getState().updateLastSeenMessage(membership.conversationId, membership.userId, membership.lastSeenMessageId)
+      }
+
       socket.on("connect", handleConnect);
       socket.on("message:new", handleNewMessage);
+      socket.on("membership:updated", handleMessageSeen)
     
       return () => {
         socket.off("message:new");
         socket.off("connect");
+        socket.off("membership:updated");
         socket.disconnect();
       };
   }, [currentUser]);
