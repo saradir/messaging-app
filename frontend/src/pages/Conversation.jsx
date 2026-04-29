@@ -90,13 +90,15 @@ export function Conversation(){
                 
             }
         }
-
         loadMessages();
+    }, [conversationId, setMessages]);
+
+    useEffect(() =>{
         socket.emit("conversation:join", conversationId);
         return () => {
-            // emit leave later
-        };
-    }, [conversationId, setMessages]);
+            socket.emit('conversation:leave', conversationId); };
+        
+    })
     
     
     if(loading) return <p>Loading messages...</p>
