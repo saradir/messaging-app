@@ -16,7 +16,7 @@ export function ConversationRow({conversation}){
     return(
         <div className={isActive ? "conversation-row active" : "conversation-row"} onClick={handleClick} >
             <div className="conversation-title">
-                {conversation.participants[0].username}
+                {conversation.partners.username}
             </div>
 
             <div className="conversation-preview">

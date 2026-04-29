@@ -39,7 +39,9 @@ export  function login(req, res, next){
         return next(err);
         }
 
-        if(!user) return res.status(401).json({
+        if(!user) return res
+        .set("Cache-Control", "no-store")
+        .status(401).json({
             success: false, message: "Invalid Credentials"
         });
     
@@ -48,7 +50,9 @@ export  function login(req, res, next){
       if (err) {
         return next(err);
       }
-        return res.json({
+        return res
+        .set("Cache-Control", "no-store")
+        .json({
             success: true,
             user
         });
@@ -56,18 +60,21 @@ export  function login(req, res, next){
     })(req, res, next);
 }
 
+export function logout(req, res, next) {
+  req.logout((err) => {
+    if (err) return next(err);
 
+    req.session.destroy((err) => {
+      if (err) return next(err);
 
+      res.clearCookie("connect.sid");
 
-export function logout(req, res, next){
-    req.logout((err) => {
-        if(err){
-            return next(err);
-        }
-    return res.status(200).json({
-        success: true
+      return res
+        .set("Cache-Control", "no-store")
+        .status(200)
+        .json({ success: true });
     });
-    });
+  });
 }
 
 export function identify(req, res, next){
@@ -75,5 +82,7 @@ export function identify(req, res, next){
     if(!req.user) return res.status(401).json({
         success:false, message: "Operation failed"
     });
-    return res.status(200).json(req.user);
+    return res
+    .set("Cache-Control", "no-store")
+    .status(200).json(req.user);
 }

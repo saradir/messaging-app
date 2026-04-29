@@ -13,7 +13,6 @@ export default function Login(){
     const [submitting, setSubmitting] = useState(false);
     const {setCurrentUser} = useContext(AuthContext);
     const navigate = useNavigate();
-
     async function onSubmit(e){
         e.preventDefault();
         setSubmitting(true);
@@ -22,9 +21,10 @@ export default function Login(){
             const response = await  fetch(`${import.meta.env.VITE_API_SERVER}/auth/login`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 credentials: "include",
+                cache: "no-store",
                 body: JSON.stringify({
                     "email" : e.target.email.value,
                     "password": e.target.password.value              

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMessages, sendMessage } from "../services/conversations.js"
+import { fetchMessages, sendMessage, updateLastSeenMessage } from "../services/conversations.js"
 import { MessageComposer } from "../components/MessageComposer.jsx";
 import { MessagesContainer } from "../components/MessagesContainer.jsx";
 import { ConversationHeader } from "../components/ConversationHeader.jsx";
@@ -13,41 +13,46 @@ export function Conversation(){
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null)
-    const [showScrollButton, setShowScrollButton] = useState(false);
     const { currentUser} = useContext(AuthContext);
-    const { conversationId } = useParams();
-    const bottomRef = useRef(null);
-    const hasLoaded = useRef(false);
-    const containerRef = useRef(null);
-    const nearBottomRef = useRef(true);
+    const conversationId = Number(useParams().conversationId);
 
-    const isNearBottom = () => {
-        const container = containerRef.current;
-        if(!container) return false;
-        return (container.scrollHeight - container.scrollTop - container.clientHeight < 100);
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const messages = useChatStore((state) => state.messagesByConversation[conversationId]) || [];
     const setMessages = useChatStore((state) => state.setMessages);
-    const receiveMessage = useChatStore((state => state.receiveMessage));
-    const updateMessageStatus = useChatStore((state => state.updateMessageStatus));
+    const receiveMessage = useChatStore((state) => state.receiveMessage);
+    const updateMessageStatus = useChatStore((state) => state.updateMessageStatus);
+    const updateLastSeenMessageToStore = useChatStore((state) => state.updateLastSeenMessage)
     const conversation = useChatStore(
-        state => state.conversations.find(c => c.id === Number(conversationId))
+        state => state.conversations.find(c => c.id === conversationId)
         );
-    const otherUser = conversation?.participants.find(
-        p => p.id !== currentUser.id
+    const memberships = useChatStore((state) => state.membershipsByConversation[conversationId]);
+    const partnerMembership = conversation?.memberships.find(
+        m => m.id !== currentUser.id
         );
+    const committedLastSeenMessageId = memberships?.[currentUser.id]?.lastSeenMessageId;
+    const lastSeenByPartnerId = memberships?.[partnerMembership?.id]?.lastSeenMessageId;
+    const pendingSeenRef = useRef(committedLastSeenMessageId);
+    const timeoutIdRef = useRef(null);
 
-    function handleScroll(){
-        nearBottomRef.current = isNearBottom();
-        setShowScrollButton (!nearBottomRef.current);
-     }
+    // Handle when unseen message comes into view
+    function handleMessageSeen(messageId){
+        pendingSeenRef.current = messageId;
+        // throttled updates to store
+        if(timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = setTimeout(async () => {
+            const latestMessageId = pendingSeenRef.current;
+            try{
+                await updateLastSeenMessage(conversationId, latestMessageId);
+                updateLastSeenMessageToStore(conversationId, latestMessageId);
+            } catch (error) {
+                console.error("Failed to update seen message in server", error);
+            }
+        }, 1000);
+    }
     
     async function handleSubmitMessage(content){
 
         const clientId = crypto.randomUUID();
-        const message = {authorId: currentUser.id, conversationId, content, status: "pending", clientId }
+        const message = {authorId: currentUser.id, conversationId, content, status: "pending", clientId, createdAt: new Date().toISOString() }
         receiveMessage(message); // Update optimistically       
         try{
             await sendMessage(message);
@@ -86,56 +91,25 @@ export function Conversation(){
                 
             }
         }
-
         loadMessages();
+    }, [conversationId, setMessages]);
+
+    useEffect(() =>{
         socket.emit("conversation:join", conversationId);
         return () => {
-            // emit leave later
-        };
-    }, [conversationId, setMessages]);
+            socket.emit('conversation:leave', conversationId); };
+        
+        },[conversationId])
     
     
-    useEffect(() => {
-        hasLoaded.current = false;
-    }, [conversationId]);
-
-
-    //---Scroll Behaviour---//
-    useEffect(() => {
-        if(!hasLoaded.current){
-            bottomRef.current?.scrollIntoView({ behavior: "auto" });
-            hasLoaded.current = true;
-        }else{
-            if(nearBottomRef.current){
-                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-            }
-        }
-    }, [messages]);
-
-
     if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
-
+    if (!conversation) return <p>Loading conversation...</p>;
     return(
 
         <div className="conversation-container">
-            <ConversationHeader username={otherUser.username} />
-            <MessagesContainer messages={messages} handleResendMessage={handleResendMessage} bottomRef={bottomRef} containerRef={containerRef} onScroll={handleScroll} />
-            <button
-                className={`scroll-button ${showScrollButton ? "visible" : ""}`}
-                onClick={() => bottomRef.current?.scrollIntoView({ behavior: "smooth" })}
-                >
-<svg viewBox="0 0 24 24">
-    <path
-      d="M12 5v12M6.5 11.5L12 17l5.5-5.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-            </button>
+            <ConversationHeader username={partnerMembership?.username} />
+            <MessagesContainer key={conversationId} messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={lastSeenByPartnerId} />
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )

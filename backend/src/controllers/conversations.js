@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
+import { getIO } from "../config/socket.js"; 
 
 
 // Fetch all conversations of current user
@@ -20,7 +21,7 @@ export async function index(req, res, next){
                             select: {
                                 user: {select: {id: true, username: true}},
                                 role: true,
-                                lastReadAt: true
+                                lastSeenMessageId: true
                             },
                         },                    
                         messages: {
@@ -41,13 +42,18 @@ export async function index(req, res, next){
             const c = m.conversation;
             return{
                 id: c.id,
-                participantHash: c.participantHash,
                 updatedAt: c.updatedAt,
                 lastMessage: c.messages[0] ?? null,
-                participants: c.memberships
-                .map((mm) => mm.user)
-                .filter((u) => u.id !== req.user.id),
-                myMembership: { role: m.role, lastReadAt: m.lastReadAt },
+                partners: c.memberships
+                        .filter(mm => mm.user.id !== req.user.id)
+                        .map(mm => mm.user),
+                memberships: c.memberships
+                .map((mm) => ({
+                    id: mm.user.id,
+                    username: mm.user.username,
+                    role: mm.role,
+                    lastSeenMessageId: mm.lastSeenMessageId, 
+                    })),                
             };
         });
                 
@@ -115,6 +121,61 @@ export async function startConversation(req, res, next){
 
     } catch (err){
         next(err);
+    }
+}
+
+export async function updateLastSeenMessage(req, res, next){
+
+    try {
+            const io = getIO();
+            const { messageId, conversationId } = matchedData(req);
+            const membership = await prisma.membership.findUnique({
+                where: {userId_conversationId: 
+                            {userId: req.user.id, conversationId}
+                        }
+            });
+        
+            if(!membership){
+                return res.status(404).json({
+                    success: false,
+                    message: "Membership not found"
+                });
+            }
+
+            const message = await prisma.message.findFirst({
+                where: {conversationId, id: messageId}
+            });
+
+            if(!message){
+                return res.status(404).json({
+                    success: false,
+                    message: "Invalid message ID"
+                });
+            }
+
+            let updatedMembership;
+            if(membership.lastSeenMessageId  === null || messageId > membership.lastSeenMessageId){
+                updatedMembership = await prisma.membership.update({
+                    where: {userId_conversationId: 
+                            {userId: req.user.id, conversationId}
+                        },
+                    data: {lastSeenMessageId: messageId},
+                    select: {conversationId: true, userId: true, lastSeenMessageId: true}
+                });
+                
+            }
+
+            
+            io.to(`conversation:${conversationId}`).emit("membership:updated", updatedMembership);
+            console.log("Membership updated: ", updatedMembership);
+        
+            return res.status(200).json({
+                success: true,
+                data: { updatedMembership }
+            })
+        
+    } catch (err) {
+        next(err);    
     }
 }
 

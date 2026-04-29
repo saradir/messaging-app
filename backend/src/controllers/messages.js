@@ -42,10 +42,9 @@ export async function create(req, res, next){
 
 
 
-        message.conversation.memberships.forEach( m => {
-            io.to(`user:${m.user.id}`).emit("message:new", message);
-            console.log(`message sent to ${m.user.username}`)
-        })
+        io.to(`conversation:${conversationId}`).emit("message:new", message);
+        console.log(`message sent to room: ${conversationId}`);
+        
         return res.status(201).json({
             success: true,
             data: message
@@ -81,13 +80,13 @@ const { conversationId } = matchedData(req);
                 conversationId
             },
 
-            orderBy: { createdAt: "asc" },
+            orderBy: { createdAt: "desc" },
             take: limit
          })
 
          return res.status(200).json({
             success: true,
-            data: messages
+            data: messages.reverse()
          });
     } catch(err){
         next(err);
