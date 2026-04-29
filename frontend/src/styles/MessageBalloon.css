@@ -30,7 +30,6 @@
   align-items: flex-end;
   justify-content: flex-end; /* Keeps everything right-aligned inside the bubble */
   gap: 6px; /* Gap between the last word and the icons */
-  
   position: relative;
   box-shadow: 0 1px 0.5px rgba(0,0,0,0.15);
 }
@@ -51,6 +50,7 @@
 .message-text {
   flex: 1 1 auto; /* Allows the text to fill the space */
   white-space: pre-wrap;
+  font-size: 20px;
 }
 
 /* --- Status Area (Checkmarks/Pending) --- */
@@ -105,4 +105,19 @@
 /* Hide status on incoming messages to keep the UI clean */
 .message-container.left .message-status {
   display: none;
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    align-self: flex-end; 
+    margin-top: 2px;      /* Creates that "slightly below" feel */
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.message-timestamp {
+    white-space: nowrap;
+    color:#8e8e8e;
 }

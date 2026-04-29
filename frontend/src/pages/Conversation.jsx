@@ -52,7 +52,7 @@ export function Conversation(){
     async function handleSubmitMessage(content){
 
         const clientId = crypto.randomUUID();
-        const message = {authorId: currentUser.id, conversationId, content, status: "pending", clientId }
+        const message = {authorId: currentUser.id, conversationId, content, status: "pending", clientId, createdAt: new Date().toISOString() }
         receiveMessage(message); // Update optimistically       
         try{
             await sendMessage(message);
