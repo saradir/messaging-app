@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
+import { getIO } from "../config/socket.js"; 
 
 
 // Fetch all conversations of current user
@@ -126,6 +127,7 @@ export async function startConversation(req, res, next){
 export async function updateLastSeenMessage(req, res, next){
 
     try {
+            const io = getIO();
             const { messageId, conversationId } = matchedData(req);
             const membership = await prisma.membership.findUnique({
                 where: {userId_conversationId: 
@@ -151,22 +153,25 @@ export async function updateLastSeenMessage(req, res, next){
                 });
             }
 
-            let lastSeen = membership.lastSeenMessageId;
+            let updatedMembership;
             if(membership.lastSeenMessageId  === null || messageId > membership.lastSeenMessageId){
-                const updatedMembership = await prisma.membership.update({
+                updatedMembership = await prisma.membership.update({
                     where: {userId_conversationId: 
                             {userId: req.user.id, conversationId}
                         },
                     data: {lastSeenMessageId: messageId},
-                    select: {lastSeenMessageId: true}
+                    select: {conversationId: true, userId: true, lastSeenMessageId: true}
                 });
                 
-                lastSeen = updatedMembership.lastSeenMessageId;
             }
+
+            
+            io.to(`conversation:${conversationId}`).emit("membership:updated", updatedMembership);
+            console.log("Membership updated: ", updatedMembership);
         
             return res.status(200).json({
                 success: true,
-                data: { lastSeenMessageId: lastSeen }
+                data: { updatedMembership }
             })
         
     } catch (err) {
