@@ -6,7 +6,7 @@ export function MessageObserver({message, lastSeenMessageId, handleMessageSeen, 
     const { ref: inViewRef, inView } = useInView({
         threshold: 1,
         triggerOnce: true,
-        skip: message.id <= lastSeenMessageId,
+        skip: message.id <= lastSeenMessageId.current,
         onChange: (inView) => {
             if (inView) handleMessageSeen(message.id);
         }
