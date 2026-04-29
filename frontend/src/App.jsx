@@ -15,6 +15,7 @@ import { fetchConversations } from './services/conversations';
 
 function App() {
   const setConversations = useChatStore((state) => state.setConversations);
+  const setCurrentUserId = useChatStore((state) => state.setCurrentUserId);
   const [currentUser, setCurrentUser] = useState(null);
   const [error, setError] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -31,6 +32,7 @@ function App() {
         if(response.ok){
           const data = await response.json();
           setCurrentUser(data);
+          setCurrentUserId(data.id);
         }
       } catch (err) {
         console.error("Error contacting /auth/identify: ", err);
@@ -41,7 +43,7 @@ function App() {
       }   
     }
     authUser();
-  }, []);
+  }, [setCurrentUserId]);
 
     // Connect socket
     useEffect(() => {

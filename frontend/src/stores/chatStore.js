@@ -35,6 +35,9 @@ export const useChatStore = create((set, get) => ({
       },
     })),
 
+  setCurrentUserId: (id) =>
+    set(({currentUserId: id})),
+
   receiveMessage: (message) => {
     const { conversationId } = message;
     const state = get();
