@@ -29,6 +29,7 @@ export function Conversation(){
         m => m.id !== currentUser.id
         );
     const committedLastSeenMessageId = memberships?.[currentUser.id]?.lastSeenMessageId;
+    const lastSeenByPartnerId = memberships?.[partnerMembership?.id]?.lastSeenMessageId;
     const pendingSeenRef = useRef(committedLastSeenMessageId);
     const timeoutIdRef = useRef(null);
 
@@ -108,7 +109,7 @@ export function Conversation(){
 
         <div className="conversation-container">
             <ConversationHeader username={partnerMembership?.username} />
-            <MessagesContainer key={conversationId} messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={partnerMembership.lastSeenMessageId} />
+            <MessagesContainer key={conversationId} messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={lastSeenByPartnerId} />
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )
