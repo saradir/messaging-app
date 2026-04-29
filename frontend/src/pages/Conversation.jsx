@@ -99,7 +99,7 @@ export function Conversation(){
         return () => {
             socket.emit('conversation:leave', conversationId); };
         
-    })
+        },[conversationId])
     
     
     if(loading) return <p>Loading messages...</p>
