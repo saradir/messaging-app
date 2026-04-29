@@ -3,7 +3,7 @@ import {  Fragment, useEffect, useRef, useState, useCallback } from "react";
 import "../styles/MessagesContainer.css";
 import { MessageObserver } from "./MessageObserver";
 
-export function MessagesContainer({ messages, handleResendMessage, lastSeenMessageId, handleMessageSeen }) {
+export function MessagesContainer({ messages, handleResendMessage, lastSeenMessageId, handleMessageSeen, lastSeenByPartnerId }) {
     const nearBottomRef = useRef(true);  // used in ref to track whether user was in ref BEFORE message arrives
     const hasLoaded = useRef(false);
     const containerRef = useRef(null);
@@ -78,7 +78,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
                 return(
                     <Fragment key={m.id}>
                         {i===dividerIndex && <div ref={setDividerRef} className="unseen-divider">Unseen Messages </div>}
-                        <MessageObserver lastSeenMessageId={lastSeenRef} onResend={handleResendMessage} message={m} handleMessageSeen={handleMessageSeen} />                       
+                        <MessageObserver lastSeenMessageId={lastSeenRef} onResend={handleResendMessage} message={m} handleMessageSeen={handleMessageSeen} lastSeenByPartnerId={lastSeenByPartnerId} />                       
                     </Fragment>
                 );
             })}

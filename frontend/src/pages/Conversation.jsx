@@ -24,10 +24,11 @@ export function Conversation(){
     const conversation = useChatStore(
         state => state.conversations.find(c => c.id === conversationId)
         );
-    const otherUser = conversation?.participants.find(
-        p => p.id !== currentUser.id
+    const memberships = useChatStore((state) => state.membershipsByConversation[conversationId]);
+    const partnerMembership = conversation?.memberships.find(
+        m => m.id !== currentUser.id
         );
-    const committedLastSeenMessageId = conversation?.myMembership.lastSeenMessageId;
+    const committedLastSeenMessageId = memberships[currentUser.id].lastSeenMessageId;
     const pendingSeenRef = useRef(committedLastSeenMessageId);
     const timeoutIdRef = useRef(null);
 
@@ -104,8 +105,8 @@ export function Conversation(){
     return(
 
         <div className="conversation-container">
-            <ConversationHeader username={otherUser?.username} />
-            <MessagesContainer key={conversationId} messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} />
+            <ConversationHeader username={partnerMembership?.username} />
+            <MessagesContainer key={conversationId} messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={partnerMembership.lastSeenMessageId} />
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )
