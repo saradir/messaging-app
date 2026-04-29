@@ -54,5 +54,8 @@ const io = initSocket(httpServer);
 
 registerSocketHandlers(io);
 
-httpServer.listen(PORT);
+httpServer.listen(PORT,  () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
 export default app;
