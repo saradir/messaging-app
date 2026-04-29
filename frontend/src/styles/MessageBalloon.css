@@ -1,34 +1,108 @@
+/* --- Message Container & Alignment --- */
 .message-container {
   display: flex;
-  padding: 0 0.25rem;
-}
-
-.message-container.left {
-  justify-content: flex-start;
+  padding: 0 0.5rem;
+  margin-bottom: 0.4rem;
+  width: 100%;
 }
 
 .message-container.right {
   justify-content: flex-end;
 }
 
-.message-content {
-  max-width: 60%;
-  padding: 0.5rem 0.75rem;
-  border-radius: 10px;
-
-  border-radius: 8px;
-  font-size: 0.9rem;
-  line-height: 1.4;
-
-  word-break: break-word;
+.message-container.left {
+  justify-content: flex-start;
 }
 
-.message-container.left .message-content {
-  background: var(--bg-panel);
-  color: var(--text-main);
+/* --- The Message Bubble --- */
+.message-content {
+  max-width: 75%;
+  padding: 0.4rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+  
+  /* The Magic for same-line status */
+  display: flex;
+  flex-direction: row; 
+  flex-wrap: wrap;     /* Allows status to drop down if text is too long */
+  align-items: flex-end;
+  justify-content: flex-end; /* Keeps everything right-aligned inside the bubble */
+  gap: 6px; /* Gap between the last word and the icons */
+  
+  position: relative;
+  box-shadow: 0 1px 0.5px rgba(0,0,0,0.15);
 }
 
 .message-container.right .message-content {
   background: var(--accent-soft);
   color: var(--text-main);
+  border-top-right-radius: 4px;
+}
+
+.message-container.left .message-content {
+  background: var(--bg-panel);
+  color: var(--text-main);
+  border-top-left-radius: 4px;
+}
+
+/* --- Internal Text --- */
+.message-text {
+  flex: 1 1 auto; /* Allows the text to fill the space */
+  white-space: pre-wrap;
+}
+
+/* --- Status Area (Checkmarks/Pending) --- */
+.message-status {
+  display: flex;
+  align-items: center;
+  font-size: 0.65rem;
+  min-height: 14px;
+  user-select: none;
+  flex: 0 0 auto; /* Prevents status from stretching or shrinking */
+  
+  /* Slight negative margin to align checkmarks with text baseline */
+  margin-bottom: -1px; 
+}
+
+/* Status colors and themes */
+.message-container.right .message-status {
+  color: var(--text-muted, #8e8e8e);
+}
+
+.read-status {
+  color: #34b7f1; /* High-visibility blue for read receipts */
+  font-weight: bold;
+}
+
+.delivered-status {
+  opacity: 0.7;
+}
+
+.pending-status {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.failed-status {
+  color: #ff5252;
+  font-weight: 600;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-weight: bold;
+  margin-left: 2px;
+}
+
+/* Hide status on incoming messages to keep the UI clean */
+.message-container.left .message-status {
+  display: none;
 }

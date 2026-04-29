@@ -9,11 +9,11 @@ export function MessageBalloon({ message, onResend, isRead }){
     return(
         <div className={`message-container ${belongsToCurrentUser? "right" : "left"}`}>
             <div className="message-content">
-                {message.content}
-            </div>
-
-            {belongsToCurrentUser &&
+                <span className="message-text">{message.content}</span>
             
+
+                {belongsToCurrentUser &&
+                
                 <div className="message-status">
 
                     {message.status === "failed" 
@@ -24,16 +24,17 @@ export function MessageBalloon({ message, onResend, isRead }){
                         && <div><span className="pending-status">Sending... </span></div>
                     }
 
-                    {isRead  
+                    {!message.status && isRead  
                         && <div><span className="read-status"> ✓✓ </span></div>
                     }
                     
-                    {!isRead
+                    {!message.status && !isRead
                         && <div><span className="delivered-status"> ✓ </span></div>
                     }
 
                 </div>
-            }
+                }
+            </div>
         </div>
     )
 }
