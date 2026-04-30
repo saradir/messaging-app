@@ -2,7 +2,7 @@ import session from "express-session";
 
 
 export const sessionMiddleware = session({
-  secret: "secret",
+  secret: process.env.COOKIE_SECRET,
   resave: false,
   saveUninitialized: false,
 });
