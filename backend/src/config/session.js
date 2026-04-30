@@ -9,11 +9,6 @@ export const sessionMiddleware = session({
     tableName: 'Session',
     createTableIfMissing: true 
   }),
-  columns: {
-      sid: 'sid',       // Session ID
-      sess: 'data',     // The session data 
-      expire: 'expiresAt' // The expiration timestamp
-  },
   secret: process.env.COOKIE_SECRET,
   resave: false,
   saveUninitialized: false,
