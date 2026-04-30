@@ -1,5 +1,5 @@
 import { UserRow } from "./UserRow"
-import "../styles/searchResults.css";
+import "../styles/SearchResults.css";
 
 export function SearchResults({ contacts, viewUserProfile, handleRowClick}){
 
