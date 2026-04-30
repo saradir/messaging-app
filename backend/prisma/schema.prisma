@@ -74,5 +74,6 @@ enum MembershipRole {
 model Session {
   id        String   @id @default(cuid())
   sid       String   @unique
-  sess      Json     
+  sess      Json 
+  expire    DateTime     
 }
