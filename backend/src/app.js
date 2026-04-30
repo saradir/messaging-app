@@ -13,7 +13,7 @@ import { initSocket, registerSocketHandlers } from "./config/socket.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+app.set("trust proxy", 1); // make sure express doesn't block cloud host's cookie because of proxy header
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
