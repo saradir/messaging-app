@@ -11,7 +11,7 @@ export const sessionMiddleware = session({
   }),
   columns: {
       sid: 'sid',       // Session ID
-      sess: 'data',     // The session data (this was the missing link!)
+      sess: 'data',     // The session data 
       expire: 'expiresAt' // The expiration timestamp
   },
   secret: process.env.COOKIE_SECRET,
