@@ -9,6 +9,7 @@ import { startConversation } from "../services/conversations"
 import "../styles/Contacts.css";
 import { useModal } from "../hooks/useModal";
 import { useNavigate } from "react-router-dom";
+import { useChatStore } from "../stores/chatStore";
 
 export function Contacts({setView}){
     const contactProfile = useModal();
@@ -19,6 +20,7 @@ export function Contacts({setView}){
     const [searchResults, setSearchResults] = useState(null);
     const [searchMode, setSearchMode] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const updateNewConversation = useChatStore((state) => state.updateNewConversation)
     const [pending, setPending] = useState(false);
 
     async function handleRemoveContact(contactId){
@@ -39,8 +41,9 @@ export function Contacts({setView}){
     }
 
     async function handleRowClick(userId){       
-        const {id} = await startConversation(userId);
-        navigate(`/conversations/${id}`);
+        const conversation = await startConversation(userId);
+        updateNewConversation(conversation);
+        navigate(`/conversations/${conversation.id}`);
         setView("chats");
     }
 
