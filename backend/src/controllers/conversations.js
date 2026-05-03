@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
 import { getIO } from "../config/socket.js"; 
-
+import { flattenConversation } from "../utils/utils.js";
 
 // Fetch all conversations of current user
 export async function index(req, res, next){
@@ -40,21 +40,7 @@ export async function index(req, res, next){
 
         const conversations = memberships.map(m => {
             const c = m.conversation;
-            return{
-                id: c.id,
-                updatedAt: c.updatedAt,
-                lastMessage: c.messages[0] ?? null,
-                partners: c.memberships
-                        .filter(mm => mm.user.id !== req.user.id)
-                        .map(mm => mm.user),
-                memberships: c.memberships
-                .map((mm) => ({
-                    id: mm.user.id,
-                    username: mm.user.username,
-                    role: mm.role,
-                    lastSeenMessageId: mm.lastSeenMessageId, 
-                    })),                
-            };
+            return flattenConversation(c, req.user.id);
         });
                 
         return res.status(200).json({
@@ -108,13 +94,30 @@ export async function startConversation(req, res, next){
                         },
                     ]
                 }
-            }
+            },
+            select: {
+                        id: true,
+                        participantHash: true,
+                        updatedAt: true,
+                        memberships: {
+                            select: {
+                                user: {select: {id: true, username: true}},
+                                role: true,
+                                lastSeenMessageId: true
+                            },
+                        },                    
+                        messages: {
+                            select: { id: true, createdAt: true, authorId: true, content: true },
+                            orderBy: {createdAt: "desc"},
+                            take: 1
+                        },
+                    },
         });
 
 
         return res.status(200).json({
             success: true,
-            data: conversation
+            data: flattenConversation(conversation, req.user.id)
         });
 
     } catch (err){
