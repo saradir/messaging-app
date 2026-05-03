@@ -22,7 +22,6 @@ export function Contacts({setView}){
     const [selectedUser, setSelectedUser] = useState(null);
     const [pending, setPending] = useState(false);
     const updateNewConversation = useChatStore((state) => state.updateNewConversation)
-    const [pending, setPending] = useState(false);
 
     async function handleRemoveContact(contactId){
 
