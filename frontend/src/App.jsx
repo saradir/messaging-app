@@ -24,7 +24,7 @@ function App() {
   useEffect(() => {
     async function authUser(){
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/auth/me`, {
+        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/auth/me`, {
           credentials: "include",
           cache: "no-store",
         });

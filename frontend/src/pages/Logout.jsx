@@ -8,7 +8,7 @@ export function Logout(){
     const navigate = useNavigate();
     useEffect(() => {
         async function logout() {
-        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/auth/logout`, { method: "POST", credentials: "include", cache: "no-store" });
+        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/auth/logout`, { method: "POST", credentials: "include", cache: "no-store" });
         if(!response.ok){
             console.error("Something went wrong");
             return;

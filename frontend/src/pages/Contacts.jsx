@@ -78,7 +78,7 @@ export function Contacts({setView}){
         setSearchMode(true);
 
         try{
-            const response = await fetch(`${import.meta.env.VITE_API_SERVER}/contacts/search?q=${query}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/contacts/search?q=${query}`, {
                 credentials: "include"
             });
 

@@ -60,7 +60,7 @@ export default function Register(){
         setSubmitting(true);
         setMessage('');
         try{
-            const response = await  fetch(`${import.meta.env.VITE_API_SERVER}/auth/register`, {
+            const response = await  fetch(`${import.meta.env.VITE_API_SERVER}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

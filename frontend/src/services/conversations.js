@@ -1,6 +1,6 @@
 export async function startConversation(userId){
 
-        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/`,{
+        const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/conversations/`,{
             credentials: "include",
             method: "POST",
             headers: {
@@ -23,7 +23,7 @@ export async function startConversation(userId){
 
 export async function fetchMessages(conversationId){
 
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/messages`, {
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/conversations/${conversationId}/messages`, {
         credentials: "include"
     
     });
@@ -41,7 +41,7 @@ export async function fetchMessages(conversationId){
 export async function sendMessage(message){
 
     const {conversationId, content, clientId } =  message ;
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${message.conversationId}/messages`, {
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/conversations/${message.conversationId}/messages`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -66,7 +66,7 @@ export async function sendMessage(message){
 
 export async function fetchConversations(){
 
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations`,{
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/conversations`,{
         credentials: "include"
     });
 
@@ -80,7 +80,7 @@ export async function fetchConversations(){
 }
 
 export async function updateLastSeenMessage(conversationId, messageId){
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/conversations/${conversationId}/last-seen`,{
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/conversations/${conversationId}/last-seen`,{
         method: "PATCH",
         credentials: "include",
         body: JSON.stringify({

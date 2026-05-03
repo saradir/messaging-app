@@ -23,7 +23,7 @@ export async function addContact(contactId){
 
 export async function fetchContacts(){
     
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/contacts`,{
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/contacts`,{
     credentials: "include"
     });
 
