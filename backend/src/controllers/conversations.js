@@ -100,12 +100,10 @@ export async function startConversation(req, res, next){
                     create: [
                         {
                             userId: req.user.id,
-                            lastReadAt: new Date(),
                             role: "member",
                         },
                         {
                             userId: targetUserId,
-                            lastReadAt: new Date(),
                             role: "member",
                         },
                     ]
