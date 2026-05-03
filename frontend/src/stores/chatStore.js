@@ -17,13 +17,17 @@ export const useChatStore = create((set, get) => ({
   currentUserId: 0,
 
   setConversations: (conversations) => {
-    const membershipMap = {};
-    conversations.forEach(c => {
-      membershipMap[c.id] = {};
-      c.memberships.forEach(m => {
-        membershipMap[c.id][m.id] = m;
-      })
-    })
+    const membershipMap = conversations.reduce((convAcc, conversation) => {
+    // For every conversation, build its member map
+    const innerMemberMap = conversation.memberships.reduce((memAcc, m) => {
+      memAcc[m.id] = m;
+      return memAcc;
+    }, {});
+    // Assign that inner map to the conversation ID in our main accumulator
+    convAcc[conversation.id] = innerMemberMap;
+    return convAcc;
+    }, {});
+
     set({conversations: conversations, membershipsByConversation: membershipMap});
   },
 
