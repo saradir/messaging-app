@@ -23,6 +23,15 @@ export async function register(req, res, next){
                 email: true
             }
         });
+
+        // Add demo contact to all new users
+        await prisma.contact.create({
+            data:{
+                ownerId: user.id,
+                contactId: 0
+            }
+        });
+
         return res.status(201).json({
         success: true,
         data: user

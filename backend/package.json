@@ -35,6 +35,9 @@
     "prisma": "^7.3.0",
     "supertest": "^7.2.2"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "optionalDependencies": {
     "bufferutil": "*",
     "utf-8-validate": "*"
