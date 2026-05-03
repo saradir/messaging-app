@@ -94,4 +94,16 @@ export const useChatStore = create((set, get) => ({
           }
         }
       })),
+
+    updateNewConversation: (conversation) => {
+      const state = get();
+      const updatedConversations = [conversation, ...state.conversations.filter(c => c.id !== conversation.id)];
+      const newMemberships = conversation.memberships.reduce((acc, m) => {
+        acc[m.id] = m;
+        return acc;
+      }, {});
+
+      const updatedMemberships = {...state.membershipsByConversation, [conversation.id]: newMemberships}
+      set({ conversations: updatedConversations, membershipsByConversation: updatedMemberships });
+    },
   }));
