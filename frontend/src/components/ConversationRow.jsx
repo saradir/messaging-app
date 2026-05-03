@@ -6,7 +6,7 @@ import "../styles/ConversationRow.css";
 export function ConversationRow({conversation}){
     const navigate = useNavigate();
     const { conversationId } = useParams();
-
+    const title = conversation.partners.map(p => p.username).join(", ");
     const isActive = String(conversation.id) === conversationId;
 
     function handleClick(){
@@ -16,7 +16,7 @@ export function ConversationRow({conversation}){
     return(
         <div className={isActive ? "conversation-row active" : "conversation-row"} onClick={handleClick} >
             <div className="conversation-title">
-                {conversation.partners.username}
+                { title }     
             </div>
 
             <div className="conversation-preview">
