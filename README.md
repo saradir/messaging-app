@@ -34,7 +34,7 @@ Nettalker is a real-time communication platform designed for speed and reliabili
     ```env
     DATABASE_URL="your_supabase_connection_string"
     COOKIE_SECRET="your_random_64_char_string"
-    FRONTEND_URL="http://localhost:5173"
+    CORS_ORIGINS="http://localhost:5173"
     NODE_ENV="development"
     ```
 
