@@ -113,10 +113,10 @@ export async function startConversation(req, res, next){
                         },
                     },
         });
-
+        const normalized = flattenConversation(conversation, req.user.id);
         return res.status(200).json({
             success: true,
-            data: flattenConversation(conversation, req.user.id)
+            data: normalized
         });
 
     } catch (err){
