@@ -1,6 +1,6 @@
 export async function addContact(contactId){
 
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/contacts/`,{
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/contacts/`,{
         credentials: "include",
         method: "POST",
         headers: {
@@ -37,7 +37,7 @@ export async function fetchContacts(){
 } 
 
 export async function removeContact(contactId){
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/contacts/${contactId}`,{
+    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/contacts/${contactId}`,{
         credentials: "include",
         method: "DELETE",
     });
