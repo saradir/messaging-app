@@ -20,6 +20,7 @@ export function Contacts({setView}){
     const [searchResults, setSearchResults] = useState(null);
     const [searchMode, setSearchMode] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [pending, setPending] = useState(false);
     const updateNewConversation = useChatStore((state) => state.updateNewConversation)
     const [pending, setPending] = useState(false);
 
