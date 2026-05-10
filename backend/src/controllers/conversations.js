@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
 import { getIO } from "../config/socket.js"; 
-import { flattenConversation } from "../utils/utils.js";
+import { flattenConversation } from "../utils/payload-format.js";
 
 // Fetch all conversations of current user
 export async function index(req, res, next){
