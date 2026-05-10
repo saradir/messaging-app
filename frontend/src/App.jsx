@@ -63,14 +63,20 @@ function App() {
         useChatStore.getState().updateLastSeenMessage(membership.conversationId, membership.userId, membership.lastSeenMessageId)
       }
 
+      function handleNewConversation(conversation){
+        useChatStore.getState().updateNewConversation(conversation);
+      }
+
       socket.on("connect", handleConnect);
       socket.on("message:new", handleNewMessage);
-      socket.on("membership:updated", handleMessageSeen)
+      socket.on("membership:updated", handleMessageSeen);
+      socket.on("conversation:new", handleNewConversation);
     
       return () => {
         socket.off("message:new");
         socket.off("connect");
         socket.off("membership:updated");
+        socket.off("conversation:new")
         socket.disconnect();
       };
   }, [currentUser]);
