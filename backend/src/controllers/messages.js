@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
 import { getIO } from "../config/socket.js"; 
+import { flattenConversation, formatMessage } from "../utils/payload-format.js";
 
 export async function create(req, res, next){
 
@@ -31,23 +32,51 @@ export async function create(req, res, next){
             },
             include: {
                 conversation: {
-                    include: {
+                    select: {
+                        id: true,
+                        participantHash: true,
+                        updatedAt: true,
                         memberships: {
-                            include: { user: { select: { id: true, username: true } } }
+                            select: {
+                                user: {select: {id: true, username: true}},
+                                role: true,
+                                lastSeenMessageId: true
+                            },
+                        },                    
+                        messages: {
+                            select: { id: true, createdAt: true, authorId: true, content: true },
+                            orderBy: {createdAt: "desc"},
+                            take: 1
+                        },
+                        _count: {
+                            select: {messages: true}
                         }
-                    }
+                    },
                 }
             }
         });
 
-
-
-        io.to(`conversation:${conversationId}`).emit("message:new", message);
-        console.log(`message sent to room: ${conversationId}`);
+        // If this is the first message in the conversation, emit new conversation event
+        if(message.conversation._count.messages === 1){
+            const flattenedConversation = flattenConversation(message.conversation); 
+            message.conversation.memberships.forEach(m =>{
+                if(m.user.id === req.user.id) return;
+                io.to(`user:${m.user.id}`).emit("conversation:new", flattenedConversation);
+                console.log(`User ${m.user.id} has been notified of new conversation`);
+            })
+        }else{
+            const payload = formatMessage(message);
+            message.conversation.memberships.forEach(m =>{
+                io.to(`user:${m.user.id}`).emit("message:new", payload);
+                console.log(`message sent to room: ${m.user.id}`);
+            })
+        }
+        // io.to(`conversation:${conversationId}`).emit("message:new", message);
+        // console.log(`message sent to room: ${conversationId}`, message);
         
         return res.status(201).json({
             success: true,
-            data: message
+            data: payload
         })
     }catch(err){
         next(err);
