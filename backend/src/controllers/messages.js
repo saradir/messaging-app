@@ -71,8 +71,6 @@ export async function create(req, res, next){
                 console.log(`message sent to room: ${m.user.id}`);
             })
         }
-        // io.to(`conversation:${conversationId}`).emit("message:new", message);
-        // console.log(`message sent to room: ${conversationId}`, message);
         
         return res.status(201).json({
             success: true,
