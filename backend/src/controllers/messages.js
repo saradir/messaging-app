@@ -55,6 +55,7 @@ export async function create(req, res, next){
                 }
             }
         });
+        const payload = formatMessage(message);
 
         // If this is the first message in the conversation, emit new conversation event
         if(message.conversation._count.messages === 1){
