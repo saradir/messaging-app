@@ -66,7 +66,6 @@ export async function create(req, res, next){
                 console.log(`User ${m.user.id} has been notified of new conversation`);
             })
         }else{
-            const payload = formatMessage(message);
             message.conversation.memberships.forEach(m =>{
                 io.to(`user:${m.user.id}`).emit("message:new", payload);
                 console.log(`message sent to room: ${m.user.id}`);
