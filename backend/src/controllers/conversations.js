@@ -1,17 +1,10 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
 import { getIO } from "../config/socket.js"; 
-import { flattenConversation } from "../utils/payload-format.js";
+import {  formatMembership } from "../utils/payload-format.js";
 
-// Fetch all conversations of current user
-export async function index(req, res, next){
 
-    try {
-        const memberships = await prisma.membership.findMany({
-            where: {
-                userId: req.user.id
-            },
-            include: {
+const includeInMembership = {
                 conversation: {
                     select: {
                         id: true,
@@ -21,7 +14,8 @@ export async function index(req, res, next){
                             select: {
                                 user: {select: {id: true, username: true}},
                                 role: true,
-                                lastSeenMessageId: true
+                                lastSeenMessageId: true,
+                                conversationId: true
                             },
                         },                    
                         messages: {
@@ -32,20 +26,39 @@ export async function index(req, res, next){
                     },
                     
                 }
+            }
+// Fetch all conversations of current user
+export async function index(req, res, next){
+
+    try {
+        const memberships = await prisma.membership.findMany({
+            where: {
+                userId: req.user.id
             },
+            include: includeInMembership,
             orderBy: { conversation: { updatedAt: "desc" } }
             
         });
 
+        const formattedMemberships = memberships.map(mm => formatMembership(mm));
 
-        const conversations = memberships.map(m => {
-            const c = m.conversation;
-            return flattenConversation(c, req.user.id);
-        });
+        const updatedMemberships = await Promise.all(formattedMemberships.map(async mm => {
+            const unreadCount = await prisma.message.count({
+                where: {
+                    conversationId: mm.conversationId,
+                    authorId: { not: req.user.id},
+                    id: {
+                        gt: mm.lastSeenMessageId ?? 0
+                    }
+                },
+            });
+            return {...mm, unreadCount}
+        }));
+
                 
         return res.status(200).json({
             success: true,
-            data: conversations
+            data: updatedMemberships
         })
     } catch (err) {
         next(err);    
@@ -76,47 +89,34 @@ export async function startConversation(req, res, next){
 
         const hash = participantKey([req.user.id, targetUserId]);
         const conversation = await prisma.conversation.upsert({
-            where:{
-                participantHash: hash
+        where: { participantHash: hash },
+        update: {},
+        create: {
+            participantHash: hash,
+            memberships: {
+            create: [
+                { userId: req.user.id, role: "member" },
+                { userId: targetUserId, role: "member" },
+            ],
             },
-            update:{},
-            create:{
-                participantHash: hash,
-                memberships: {
-                    create: [
-                        {
-                            userId: req.user.id,
-                            role: "member",
-                        },
-                        {
-                            userId: targetUserId,
-                            role: "member",
-                        },
-                    ]
-                }
+        },
+        select: {
+            memberships: {
+            where: { userId: req.user.id },
+            include: includeInMembership,
             },
-            select: {
-                        id: true,
-                        participantHash: true,
-                        updatedAt: true,
-                        memberships: {
-                            select: {
-                                user: {select: {id: true, username: true}},
-                                role: true,
-                                lastSeenMessageId: true
-                            },
-                        },                    
-                        messages: {
-                            select: { id: true, createdAt: true, authorId: true, content: true },
-                            orderBy: {createdAt: "desc"},
-                            take: 1
-                        },
-                    },
+        },
         });
-        const normalized = flattenConversation(conversation, req.user.id);
+
+        const membership = conversation.memberships[0];
+
+        const formatted = {
+        ...formatMembership(membership),
+        unreadCount: 0,
+        };
         return res.status(200).json({
             success: true,
-            data: normalized
+            data: formatted
         });
 
     } catch (err){

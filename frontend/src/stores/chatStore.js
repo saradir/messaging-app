@@ -1,48 +1,69 @@
 import { create } from "zustand";
 
 
-const sortConversations = (conversations) => {
-  conversations.sort((a, b) => {
-      const aTime = a.lastMessage?.createdAt || 0;
-      const bTime = b.lastMessage?.createdAt || 0;
-      return bTime - aTime;
-    });
-  return conversations;
-}
+const sortConversations = (conversations) =>
+  [...conversations].sort((a, b) => {
+    const aTime = new Date(a.lastMessage?.createdAt ?? 0).getTime();
+    const bTime = new Date(b.lastMessage?.createdAt ?? 0).getTime();
+    return bTime - aTime;
+  });
+
 
 export const useChatStore = create((set, get) => ({
-  conversations: [],
+  conversations: null,
   messagesByConversation: {},
-  membershipsByConversation: {},
-  currentUserId: 0,
+  membershipsByConversationUser: {},
+  currentUserId: null,
 
-  setConversations: (conversations) => {
-    const membershipMap = conversations.reduce((convAcc, conversation) => {
-    // For every conversation, build its member map
-    const innerMemberMap = conversation.memberships.reduce((memAcc, m) => {
-      memAcc[m.id] = m;
-      return memAcc;
-    }, {});
-    // Assign that inner map to the conversation ID in our main accumulator
-    convAcc[conversation.id] = innerMemberMap;
-    return convAcc;
-    }, {});
+// helper function to calculate undread count
+  getUnreadCount: (conversationId) => {
+      const state = get();
+      const messages = state.messagesByConversation[conversationId] ?? [];
+      const lastSeenMessageId =
+      state.membershipsByConversationUser[conversationId]?.[state.currentUserId]?.lastSeenMessageId ?? 0;
 
-    set({conversations: conversations, membershipsByConversation: membershipMap});
+      return messages.filter(
+        m => m.authorId !== state.currentUserId && m.id > lastSeenMessageId
+      ).length;
   },
 
-  setMessages: (conversationId, messages) =>
-    set((state) => ({
-      messagesByConversation: {
-        ...state.messagesByConversation,
-        [conversationId]: messages,
-      },
+  // Sets conversations array for sidebar and memberships map
+  setConversations: (memberships) => {
+        const myMemberships = memberships.map(mm => ({            
+            conversationId: mm.conversationId,
+            lastMessage: mm.lastMessage,
+            lastSeenMessageId: mm.lastSeenMessageId,
+            unreadCount: mm.unreadCount,
+        }
+        ));
+
+        const participantMemberships = memberships.reduce((acc, mm) => {
+
+            acc[mm.conversationId] = {};
+            mm.participantMemberships.forEach(pm => {
+            acc[mm.conversationId][pm.userId] = pm;
+            });
+
+            return acc;
+        },{});
+
+        set({conversations: myMemberships, membershipsByConversationUser: participantMemberships});
+
+    },
+
+    setMessages: (conversationId, messages) =>
+        set((state) => ({
+        messagesByConversation: {
+            ...state.messagesByConversation,
+            [conversationId]: messages,
+        },
     })),
 
   setCurrentUserId: (id) =>
     set(({currentUserId: id})),
 
-  receiveMessage: (message) => {
+
+    receiveMessage: (message) => {
     const { conversationId } = message;
     const state = get();
 
@@ -53,7 +74,7 @@ export const useChatStore = create((set, get) => ({
 
     // --- update conversations list ---
     const updatedConversations = state.conversations.map((c) =>
-      c.id === conversationId
+      c.conversationId === conversationId
         ? { ...c, lastMessage: message }
         : c
     );
@@ -69,8 +90,7 @@ export const useChatStore = create((set, get) => ({
     });
   },
 
-
-  updateMessageStatus: (conversationId, messageClientId, status) => {
+    updateMessageStatus: (conversationId, messageClientId, status) => {
     const state = get();
     const existing = state.messagesByConversation[conversationId] || [];
     const message = existing.find(m => m.clientId === messageClientId);
@@ -81,19 +101,40 @@ export const useChatStore = create((set, get) => ({
 
   },
 
-    updateLastSeenMessage: (conversationId, userId, messageId) => 
-      set((state) => ({
-        membershipsByConversation: {
-          ...state.membershipsByConversation,
+    updateLastSeenMessage: (conversationId, userId, messageId) => {
+      const state = get();
+      const isCurrentUser = userId === state.currentUserId;
+
+      const unreadCount = isCurrentUser
+        ? state.messagesByConversation[conversationId]?.filter(
+            m => m.authorId !== state.currentUserId && m.id > messageId
+          ).length ?? 0
+        : undefined;
+
+      const conversations = isCurrentUser
+        ? state.conversations.map(c =>
+            c.conversationId === conversationId
+              ? { ...c, lastSeenMessageId: messageId, unreadCount }
+              : c
+          )
+        : state.conversations;
+
+      set({
+        membershipsByConversationUser: {
+          ...state.membershipsByConversationUser,
           [conversationId]: {
-            ...state.membershipsByConversation[conversationId],
+            ...state.membershipsByConversationUser[conversationId],
             [userId]: {
-              ...state.membershipsByConversation[conversationId]?.[userId],
-              lastSeenMessageId: messageId
-            }
-          }
-        }
-      })),
+              ...state.membershipsByConversationUser[conversationId]?.[userId],
+              lastSeenMessageId: messageId,
+              ...(isCurrentUser ? { unreadCount } : {}),
+            },
+          },
+        },
+        conversations,
+    });
+  },
+
 
     updateNewConversation: (conversation) => {
       const state = get();
@@ -103,7 +144,9 @@ export const useChatStore = create((set, get) => ({
         return acc;
       }, {});
 
-      const updatedMemberships = {...state.membershipsByConversation, [conversation.id]: newMemberships}
-      set({ conversations: updatedConversations, membershipsByConversation: updatedMemberships });
+      const updatedMemberships = {...state.membershipsByConversationUser, [conversation.id]: newMemberships}
+      set({ conversations: updatedConversations, membershipsByConversationUser: updatedMemberships });
     },
-  }));
+
+}));
+

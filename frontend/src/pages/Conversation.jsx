@@ -22,16 +22,16 @@ export function Conversation(){
     const updateMessageStatus = useChatStore((state) => state.updateMessageStatus);
     const updateLastSeenMessageToStore = useChatStore((state) => state.updateLastSeenMessage)
     const conversation = useChatStore(
-        state => state.conversations.find(c => c.id === conversationId)
+        state => state.conversations?.find(c => c.conversationId === conversationId)
         );
-    const memberships = useChatStore((state) => state.membershipsByConversation[conversationId]);
-    const partnerMembership = conversation?.memberships.find(
-        m => m.id !== currentUser.id
-        );
+    const memberships = useChatStore((state) => state.membershipsByConversationUser?.[conversationId]) || {};
+    const partnerMembership = Object.values(memberships)
+        .find(m => m.userId !== currentUser.id);
     const committedLastSeenMessageId = memberships?.[currentUser.id]?.lastSeenMessageId;
-    const lastSeenByPartnerId = memberships?.[partnerMembership?.id]?.lastSeenMessageId;
+    const lastSeenByPartnerId = memberships?.[partnerMembership?.userId]?.lastSeenMessageId;
     const pendingSeenRef = useRef(committedLastSeenMessageId);
     const timeoutIdRef = useRef(null);
+
 
     // Handle when unseen message comes into view
     function handleMessageSeen(messageId){
@@ -42,7 +42,7 @@ export function Conversation(){
             const latestMessageId = pendingSeenRef.current;
             try{
                 await updateLastSeenMessage(conversationId, latestMessageId);
-                updateLastSeenMessageToStore(conversationId, latestMessageId);
+                updateLastSeenMessageToStore(conversationId, currentUser.id, latestMessageId);
             } catch (error) {
                 console.error("Failed to update seen message in server", error);
             }
