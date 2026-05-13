@@ -8,7 +8,8 @@ import { useChatStore } from "../stores/chatStore";
 export function ConversationList(){
     const conversations = useChatStore((state) => state.conversations);
     
-    if(!conversations || conversations.length === 0) return <div className="empty-state">No chats yet</div>
+    if(!conversations) return <div className="empty-state">Loading...</div>
+    if(conversations.length === 0) return <div className="empty-state">No chats yet</div>
   
     return(
 
