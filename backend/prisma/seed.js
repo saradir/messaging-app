@@ -122,6 +122,40 @@ async function main() {
     });
   }
   console.log('✅ Demo messages seeded');
+
+  // Set realistic read state based on who replied to what
+  const getMsg = (conversationId, clientId) =>
+    prisma.message.findUnique({
+      where: { conversationId_clientId: { conversationId, clientId } },
+      select: { id: true },
+    });
+
+  const [a3, a4, b3] = await Promise.all([
+    getMsg(convGuestAlice.id, 'seed-alice-3'),
+    getMsg(convGuestAlice.id, 'seed-alice-4'),
+    getMsg(convGuestBob.id, 'seed-bob-3'),
+  ]);
+
+  // Alice conv: Guest saw a4 before sending a5 (0 unread); Alice replied to a3, a5 is unread for her
+  await prisma.membership.update({
+    where: { userId_conversationId: { userId: guest.id, conversationId: convGuestAlice.id } },
+    data: { lastSeenMessageId: a4.id },
+  });
+  await prisma.membership.update({
+    where: { userId_conversationId: { userId: alice.id, conversationId: convGuestAlice.id } },
+    data: { lastSeenMessageId: a3.id },
+  });
+
+  // Bob conv: Guest sent b3 after seeing b2; b4 is unread for guest (1 unread); Bob replied to b3
+  await prisma.membership.update({
+    where: { userId_conversationId: { userId: guest.id, conversationId: convGuestBob.id } },
+    data: { lastSeenMessageId: b3.id },
+  });
+  await prisma.membership.update({
+    where: { userId_conversationId: { userId: bob.id, conversationId: convGuestBob.id } },
+    data: { lastSeenMessageId: b3.id },
+  });
+  console.log('✅ Read state seeded');
 }
 
 main()
