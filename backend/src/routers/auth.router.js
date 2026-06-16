@@ -8,6 +8,7 @@ authRouter.post("/login", loginValidator, handleValidationErrors, authController
 
 authRouter.post("/register", registrationValidator, handleValidationErrors, authController.register);
 authRouter.post("/logout", authController.logout);
+authRouter.post("/guest", authController.loginAsGuest);
 authRouter.get("/me", authController.identify )
 
 export default authRouter;

@@ -51,6 +51,30 @@ export default function Login(){
 
 
 }
+    async function onGuestLogin() {
+        setSubmitting(true);
+        setMessage('');
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/auth/guest`, {
+                method: 'POST',
+                credentials: 'include',
+                cache: 'no-store',
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setMessage(data.message || 'Guest login failed');
+                setStatus('error');
+                return;
+            }
+            setCurrentUser(data.user);
+            navigate('/');
+        } catch (err) {
+            if (err.name !== 'AbortError') setMessage(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
     if(submitting) return <p>Logging in...</p>
 
     return (
@@ -82,6 +106,9 @@ export default function Login(){
             Login
         </button>
         </form>
+        <button type="button" className="guest-btn" onClick={onGuestLogin}>
+            Preview as Guest
+        </button>
     </div>
     );
 }

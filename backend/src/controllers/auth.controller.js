@@ -86,6 +86,28 @@ export function logout(req, res, next) {
   });
 }
 
+export async function loginAsGuest(req, res, next) {
+  try {
+    const guest = await prisma.user.findUnique({
+      where: { email: 'guest@demo.com' },
+      select: { id: true, email: true, username: true },
+    });
+
+    if (!guest) {
+      return res.status(503).json({ success: false, message: 'Guest account not available' });
+    }
+
+    req.logIn(guest, (err) => {
+      if (err) return next(err);
+      return res
+        .set('Cache-Control', 'no-store')
+        .json({ success: true, user: guest });
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export function identify(req, res, next){
 
     if(!req.user) return res.status(401).json({
