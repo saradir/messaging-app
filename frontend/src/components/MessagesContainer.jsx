@@ -3,7 +3,7 @@ import {  Fragment, useEffect, useRef, useState, useCallback } from "react";
 import "../styles/MessagesContainer.css";
 import { MessageObserver } from "./MessageObserver";
 
-export function MessagesContainer({ messages, handleResendMessage, lastSeenMessageId, handleMessageSeen, lastSeenByPartnerId }) {
+export function MessagesContainer({ messages, loading, handleResendMessage, lastSeenMessageId, handleMessageSeen, lastSeenByPartnerId }) {
     const nearBottomRef = useRef(true);  // used in ref to track whether user was in ref BEFORE message arrives
     const hasLoaded = useRef(false);
     const containerRef = useRef(null);
@@ -65,7 +65,7 @@ export function MessagesContainer({ messages, handleResendMessage, lastSeenMessa
     if (!messages || messages.length === 0) {
         return (
         <div className="messages-container empty">
-            No messages yet
+            {!loading && "No messages yet"}
             <div ref={bottomRef} />
         </div>
         );

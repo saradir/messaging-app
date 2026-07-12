@@ -79,16 +79,20 @@ export function Conversation(){
     //---Load Messages---//
     useEffect(() => {
         if (!conversationId) return;
+        const cached = useChatStore.getState().messagesByConversation[conversationId];
+        if (cached !== undefined) {
+            setLoading(false);
+            return;
+        }
         async function loadMessages(){
             try {
                 const messages = await fetchMessages(conversationId);
                 setMessages(conversationId, messages);
             } catch (error) {
                 setError("Failed to load messages");
-                console.error(error);                
+                console.error(error);
             } finally{
                 setLoading(false);
-                
             }
         }
         loadMessages();
@@ -102,14 +106,13 @@ export function Conversation(){
         },[conversationId])
     
     
-    if(loading) return <p>Loading messages...</p>
     if(error) return <p>{error}</p>
     if (!conversation) return <p>Loading conversation...</p>;
     return(
 
         <div className="conversation-container">
             <ConversationHeader username={partnerMembership?.username} />
-            <MessagesContainer key={conversationId} messages={messages} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={lastSeenByPartnerId} />
+            <MessagesContainer key={conversationId} messages={messages} loading={loading} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={lastSeenByPartnerId} />
             <MessageComposer handleSubmit={handleSubmitMessage} />
         </div>
     )
