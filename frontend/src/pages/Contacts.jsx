@@ -40,10 +40,20 @@ export function Contacts({setView}){
         }
     }
 
-    async function handleRowClick(userId){       
+    async function handleRowClick(userId){
+        // If a conversation with this user already exists, skip the POST and navigate directly
+        const state = useChatStore.getState();
+        const existing = Object.entries(state.membershipsByConversationUser ?? {})
+            .find(([, members]) => members[userId] !== undefined);
+        if (existing) {
+            navigate(`/conversations/${existing[0]}`);
+            setView("chats");
+            return;
+        }
+
         const conversation = await startConversation(userId);
         updateNewConversation(conversation);
-        navigate(`/conversations/${conversation.id}`);
+        navigate(`/conversations/${conversation.conversationId}`);
         setView("chats");
     }
 

@@ -138,14 +138,24 @@ export const useChatStore = create((set, get) => ({
 
     updateNewConversation: (conversation) => {
       const state = get();
-      const updatedConversations = [conversation, ...state.conversations.filter(c => c.id !== conversation.id)];
-      const newMemberships = conversation.memberships.reduce((acc, m) => {
-        acc[m.id] = m;
+      const existing = state.conversations ?? [];
+      const updatedConversations = sortConversations([
+        conversation,
+        ...existing.filter(c => c.conversationId !== conversation.conversationId),
+      ]);
+
+      const newMemberships = conversation.participantMemberships.reduce((acc, m) => {
+        acc[m.userId] = m;
         return acc;
       }, {});
 
-      const updatedMemberships = {...state.membershipsByConversationUser, [conversation.id]: newMemberships}
-      set({ conversations: updatedConversations, membershipsByConversationUser: updatedMemberships });
+      set({
+        conversations: updatedConversations,
+        membershipsByConversationUser: {
+          ...state.membershipsByConversationUser,
+          [conversation.conversationId]: newMemberships,
+        },
+      });
     },
 
 }));

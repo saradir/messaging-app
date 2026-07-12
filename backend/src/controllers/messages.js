@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
 import { getIO } from "../config/socket.js"; 
-import { flattenConversation, formatMessage } from "../utils/payload-format.js";
+import { formatMessage } from "../utils/payload-format.js";
 
 export async function create(req, res, next){
 
@@ -59,10 +59,24 @@ export async function create(req, res, next){
 
         // If this is the first message in the conversation, emit new conversation event
         if(message.conversation._count.messages === 1){
-            const flattenedConversation = flattenConversation(message.conversation); 
+            const participantMemberships = message.conversation.memberships.map(pm => ({
+                conversationId: message.conversation.id,
+                userId: pm.user.id,
+                username: pm.user.username,
+                role: pm.role,
+                lastSeenMessageId: pm.lastSeenMessageId,
+            }));
             message.conversation.memberships.forEach(m =>{
                 if(m.user.id === req.user.id) return;
-                io.to(`user:${m.user.id}`).emit("conversation:new", flattenedConversation);
+                const conversationPayload = {
+                    userId: m.user.id,
+                    conversationId: message.conversation.id,
+                    lastMessage: message.conversation.messages[0] ?? null,
+                    lastSeenMessageId: m.lastSeenMessageId,
+                    unreadCount: 1,
+                    participantMemberships,
+                };
+                io.to(`user:${m.user.id}`).emit("conversation:new", conversationPayload);
                 console.log(`User ${m.user.id} has been notified of new conversation`);
             })
         }else{
