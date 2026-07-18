@@ -11,6 +11,7 @@ const sortConversations = (conversations) =>
 
 export const useChatStore = create((set, get) => ({
   conversations: null,
+  contacts: null,
   messagesByConversation: {},
   membershipsByConversationUser: {},
   currentUserId: null,
@@ -61,6 +62,14 @@ export const useChatStore = create((set, get) => ({
 
   setCurrentUserId: (id) =>
     set(({currentUserId: id})),
+
+  setContacts: (contacts) => set({ contacts }),
+
+  addContact: (contact) =>
+    set((state) => ({ contacts: [...(state.contacts ?? []), contact] })),
+
+  removeContact: (contactId) =>
+    set((state) => ({ contacts: state.contacts?.filter((c) => c.id !== contactId) ?? [] })),
 
 
     receiveMessage: (message) => {

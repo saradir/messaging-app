@@ -14,25 +14,23 @@ import { useChatStore } from "../stores/chatStore";
 export function Contacts({setView}){
     const contactProfile = useModal();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [contacts, setContacts] = useState(null);
     const [searchResults, setSearchResults] = useState(null);
     const [searchMode, setSearchMode] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [pending, setPending] = useState(false);
-    const updateNewConversation = useChatStore((state) => state.updateNewConversation)
+    const contacts = useChatStore((state) => state.contacts);
+    const setContacts = useChatStore((state) => state.setContacts);
+    const addContactToStore = useChatStore((state) => state.addContact);
+    const removeContactFromStore = useChatStore((state) => state.removeContact);
+    const updateNewConversation = useChatStore((state) => state.updateNewConversation);
 
     async function handleRemoveContact(contactId){
-
         setPending(true);
-
         try{
             const result = await removeContact(contactId);
-            if(result){
-                const newContacts = contacts.filter(c => c.id !== contactId);
-                setContacts(newContacts);
-            }
+            if(result) removeContactFromStore(contactId);
         } catch (err){
             console.error(err)
         } finally{
@@ -57,8 +55,6 @@ export function Contacts({setView}){
         setView("chats");
     }
 
-    
-
     function viewUserProfile(user){
         setSelectedUser(user);
         contactProfile.open();
@@ -69,15 +65,10 @@ export function Contacts({setView}){
     }
 
     async function handleAdd(id){
-
         setPending(true);
         try{
             const result = await addContact(id);
-
-            if(result.success){
-                 setContacts(prev => [...prev, result.data]);
-            }
-            
+            if(result.success) addContactToStore(result.data);
         } catch (error){
             console.error(error.message);
         } finally {
@@ -85,11 +76,8 @@ export function Contacts({setView}){
         }
     }
 
-
     async function handleSearch(query){
-
         setSearchMode(true);
-
         try{
             const response = await fetch(`${import.meta.env.VITE_API_SERVER}/api/contacts/search?q=${query}`, {
                 credentials: "include"
@@ -108,15 +96,13 @@ export function Contacts({setView}){
         }
     }
 
-
-
-
-
     useEffect(() => {
+        if (contacts !== null) return;
+        setLoading(true);
         async function loadContacts(){
             try{
-                const contacts = await fetchContacts();
-                setContacts(contacts);
+                const data = await fetchContacts();
+                setContacts(data);
             } catch (err){
                 setError(err);
                 console.error("Error: ", err);
@@ -124,9 +110,8 @@ export function Contacts({setView}){
                 setLoading(false);
             }
         }
-        
         loadContacts();
-    }, []);
+    }, [contacts, setContacts]);
 
     if(error) return <p>{error}</p>
     if(loading) return <p>Loading...</p>
