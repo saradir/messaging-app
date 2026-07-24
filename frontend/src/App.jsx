@@ -45,6 +45,11 @@ function App() {
     authUser();
   }, [setCurrentUserId]);
 
+  function updateCurrentUser(user) {
+    setCurrentUser(user);
+    setCurrentUserId(user?.id ?? null);
+  }
+
     // Connect socket
     useEffect(() => {
       
@@ -102,10 +107,10 @@ function App() {
     }, [currentUser, setConversations, authLoading]);
 
 
-  if(authLoading) return <p>Authenticating...</p>
+  if(authLoading) return <p>Loading...</p>
   if(error) return <p>{error}</p>;
   return (
-    <AuthContext value={{ currentUser, setCurrentUser }}>
+    <AuthContext value={{ currentUser, setCurrentUser: updateCurrentUser }}>
       <Routes>
         <Route element={<AuthRoute />}>
           <Route path="/login" element={<Login />} />
