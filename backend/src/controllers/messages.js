@@ -2,7 +2,7 @@ import prisma from "../config/prisma.js";
 import { matchedData } from "express-validator";
 import { getIO } from "../config/socket.js"; 
 import { formatMessage } from "../utils/payload-format.js";
-
+import { messageEvents } from "../utils/event-bus.js";
 export async function create(req, res, next){
 
     const { conversationId, content, clientId } = matchedData(req);
@@ -85,6 +85,12 @@ export async function create(req, res, next){
                 console.log(`message sent to room: ${m.user.id}`);
             })
         }
+
+        // this is currently used only for the bot module.
+        messageEvents.emit("message:new", {
+            ...payload,
+            memberIds: message.conversation.memberships.map(m => m.user.id)
+        }); 
         
         return res.status(201).json({
             success: true,

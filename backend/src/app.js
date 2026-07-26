@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import passport from './config/passport.js';
 import { sessionMiddleware } from "./config/session.js";
 import { initSocket, registerSocketHandlers } from "./config/socket.js";
+import "./bot/botModule.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
