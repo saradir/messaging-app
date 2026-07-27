@@ -111,9 +111,9 @@ export function Conversation(){
     return(
 
         <div className="conversation-container">
-            <ConversationHeader username={partnerMembership?.username} />
+            <ConversationHeader  username={partnerMembership?.username} />
             <MessagesContainer key={conversationId} messages={messages} loading={loading} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={lastSeenByPartnerId} />
-            <MessageComposer key={conversationId} handleSubmit={handleSubmitMessage} />
+            <MessageComposer key={`composer-${conversationId}`} handleSubmit={handleSubmitMessage} />
         </div>
     )
 }
