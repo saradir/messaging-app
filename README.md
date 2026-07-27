@@ -1,4 +1,4 @@
-# Nettalker
+# NetTalker
 
 A full-stack real-time chat app built with React, Node.js, and PostgreSQL.
 
