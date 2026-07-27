@@ -2,7 +2,7 @@ import prisma from "../config/prisma.js";
 import bcrypt from "bcryptjs";
 import passport from "passport";
 import { matchedData } from "express-validator";
-
+import { seedGuest } from "../utils/seed-guest.js";
 
 export async function register(req, res, next){
 
@@ -88,14 +88,18 @@ export function logout(req, res, next) {
 
 export async function loginAsGuest(req, res, next) {
   try {
-    const guest = await prisma.user.findUnique({
-      where: { email: 'guest@demo.com' },
+
+    const randomString = crypto.randomUUID();
+    const guest = await prisma.user.create({
+      data: {
+         email: `${randomString}@demo.com`,
+         username: `guest${randomString.slice(6)}`,
+         hashedPassword: randomString // Guests never authenticate via password - no need to hash a value nothing ever checks.
+      },
       select: { id: true, email: true, username: true },
     });
 
-    if (!guest) {
-      return res.status(503).json({ success: false, message: 'Guest account not available' });
-    }
+    await seedGuest(guest.id);
 
     req.logIn(guest, (err) => {
       if (err) return next(err);
