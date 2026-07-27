@@ -19,7 +19,8 @@ A full-stack real-time chat app built with React, Node.js, and PostgreSQL.
 - Persistent login sessions using `connect-pg-simple` and Prisma (survives server restarts)
 - Schema migrations managed with Prisma
 - CORS and secure cookie handling (SameSite/Secure) with environment-based config
-- Unread message counts *(in progress)*
+- Read receipts 
+- Simple AI chatbot for demo purposes, using Gemini API
 
 ## Running Locally
 
