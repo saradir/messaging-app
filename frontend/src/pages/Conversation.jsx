@@ -113,7 +113,7 @@ export function Conversation(){
         <div className="conversation-container">
             <ConversationHeader username={partnerMembership?.username} />
             <MessagesContainer key={conversationId} messages={messages} loading={loading} handleResendMessage={handleResendMessage} handleMessageSeen={handleMessageSeen} lastSeenMessageId={committedLastSeenMessageId} lastSeenByPartnerId={lastSeenByPartnerId} />
-            <MessageComposer handleSubmit={handleSubmitMessage} />
+            <MessageComposer key={conversationId} handleSubmit={handleSubmitMessage} />
         </div>
     )
 }
