@@ -156,19 +156,17 @@ export async function updateLastSeenMessage(req, res, next){
             let updatedMembership;
             if(membership.lastSeenMessageId  === null || messageId > membership.lastSeenMessageId){
                 updatedMembership = await prisma.membership.update({
-                    where: {userId_conversationId: 
+                    where: {userId_conversationId:
                             {userId: req.user.id, conversationId}
                         },
                     data: {lastSeenMessageId: messageId},
                     select: {conversationId: true, userId: true, lastSeenMessageId: true}
                 });
-                
+
+                io.to(`conversation:${conversationId}`).emit("membership:updated", updatedMembership);
+                console.log("Membership updated: ", updatedMembership);
             }
 
-            
-            io.to(`conversation:${conversationId}`).emit("membership:updated", updatedMembership);
-            console.log("Membership updated: ", updatedMembership);
-        
             return res.status(200).json({
                 success: true,
                 data: { updatedMembership }

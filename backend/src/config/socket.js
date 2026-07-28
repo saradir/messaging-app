@@ -48,9 +48,7 @@ export function registerSocketHandlers(io) {
     console.log("socket connected", socket.id);
     socket.join(`user:${socket.request.user.id}`);
 
-    
     socket.on("conversation:join", async (conversationId) => {
-      
       const user = socket.request.user;
 
       if (!user) {

@@ -55,6 +55,15 @@ export async function create(req, res, next){
                 }
             }
         });
+
+        const updatedMembership = await prisma.membership.update({
+            where: { userId_conversationId: { userId: req.user.id, conversationId } },
+            data: { lastSeenMessageId: message.id },
+            select: { conversationId: true, userId: true, lastSeenMessageId: true },
+        });
+
+        io.to(`conversation:${conversationId}`).emit("membership:updated", updatedMembership);
+
         const payload = formatMessage(message);
 
         // If this is the first message in the conversation, emit new conversation event

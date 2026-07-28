@@ -60,11 +60,18 @@ async function createBotMessage(botMessage){
                 }
             }
         });
+        const updatedMembership = await prisma.membership.update({
+            where: { userId_conversationId: { userId: BOT_USER_ID, conversationId: botMessage.conversationId } },
+            data: { lastSeenMessageId: message.id },
+            select: { conversationId: true, userId: true, lastSeenMessageId: true },
+        });
+
         const payload = formatMessage(message);
         message.conversation.memberships.forEach(m =>{
             io.to(`user:${m.user.id}`).emit("message:new", payload);
             console.log(`message sent to room: ${m.user.id}`);
         })
+        io.to(`conversation:${botMessage.conversationId}`).emit("membership:updated", updatedMembership);
         return;
     }catch(err){
         console.error(err);
