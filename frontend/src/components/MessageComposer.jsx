@@ -8,7 +8,7 @@ export function MessageComposer({handleSubmit}){
         e.preventDefault();
         if(input.trim().length === 0) return;
         try{
-            await handleSubmit(input);
+            handleSubmit(input);
             setInput('');
         } catch(err){
             console.error(err);
